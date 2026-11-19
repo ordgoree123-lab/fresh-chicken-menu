@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fresh Chicken | لوحة الإدارة</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Tahoma,Arial;
+  background:#f4f4f4;
+  color:#222;
+}
+header{
+  background:#c8102e;
+  color:white;
+  padding:20px;
+  text-align:center;
+}
+.container{
+  max-width:1000px;
+  margin:20px auto;
+  padding:15px;
+}
+.box{
+  background:white;
+  padding:20px;
+  border-radius:12px;
+  margin-bottom:15px;
+  box-shadow:0 2px 8px #0001;
+}
+input,button,select{
+  width:100%;
+  padding:12px;
+  margin:7px 0;
+  border:1px solid #ddd;
+  border-radius:8px;
+  font-size:16px;
+}
+button{
+  background:#c8102e;
+  color:white;
+  border:0;
+  cursor:pointer;
+}
+button.secondary{background:#333}
+.order{
+  border:1px solid #ddd;
+  border-radius:10px;
+  padding:15px;
+  margin:12px 0;
+}
+.order h3{margin-top:0;color:#c8102e}
+.muted{color:#777;font-size:13px}
+.hidden{display:none}
+.status{
+  font-weight:bold;
+  color:#c8102e;
+}
+.item{
+  background:#f7f7f7;
+  padding:8px;
+  margin:5px 0;
+  border-radius:6px;
+}
+#message{color:#c8102e}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h2>Fresh Chicken</h2>
+  <div>لوحة إدارة الطلبات</div>
+</header>
+
+<div class="container">
+
+  <div class="box" id="loginBox">
+    <h3>تسجيل دخول الإدارة</h3>
+    <input id="email" type="email" placeholder="البريد الإلكتروني">
+    <input id="password" type="password" placeholder="كلمة المرور">
+    <button onclick="login()">تسجيل الدخول</button>
+    <p id="message"></p>
+  </div>
+
+  <div id="dashboard" class="hidden">
+    <div class="box">
+      <h3>إدارة الطلبات</h3>
+      <button onclick="loadOrders()">تحديث الطلبات</button>
+      <button class="secondary" onclick="logout()">تسجيل الخروج</button>
+      <p id="count"></p>
+    </div>
+
+    <div class="box">
+      <div id="orders">جارٍ تحميل الطلبات...</div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAzvEG-JVY2DN30oZGmGM1Wt_HkGqnQqjY",
+  authDomain: "fresh-chicken-menu.firebaseapp.com",
+  projectId: "fresh-chicken-menu",
+  storageBucket: "fresh-chicken-menu.firebasestorage.app",
+  messagingSenderId: "353092642080",
+  appId: "1:353092642080:web:153c93521ed13ba2d12345",
+  measurementId: "G-V3BQ6YTRCN"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+const loginBox = document.getElementById("loginBox");
+const dashboard = document.getElementById("dashboard");
+const message = document.getElementById("message");
+
+auth.onAuthStateChanged(user => {
+  if(user){
+    loginBox.classList.add("hidden");
+    dashboard.classList.remove("hidden");
+    loadOrders();
+  }else{
+    loginBox.classList.remove("hidden");
+    dashboard.classList.add("hidden");
+  }
+});
+
+async function login(){
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  message.textContent = "جارٍ تسجيل الدخول...";
+
+  try{
+    await auth.signInWithEmailAndPassword(email,password);
+    message.textContent = "";
+  }catch(error){
+    message.textContent = "تعذر تسجيل الدخول: " + error.message;
+  }
+}
+
+async function logout(){
+  await auth.signOut();
+}
+
+function escapeHTML(value){
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#039;"
+  })[char]);
+}
+
+async function loadOrders(){
+  const area = document.getElementById("orders");
+  area.textContent = "جارٍ تحميل الطلبات...";
+
+  try{
+    const snapshot = await db.collection("orders")
+      .orderBy("createdAt","desc")
+      .get();
+
+    document.getElementById("count").textContent =
+      "عدد الطلبات: " + snapshot.size;
+
+    if(snapshot.empty){
+      area.textContent = "لا توجد طلبات حالياً.";
+      return;
+    }
+
+    area.innerHTML = "";
+
+    snapshot.forEach(doc => {
+      const order = doc.data();
+      const id = doc.id;
+
+      const items = Array.isArray(order.items) ? order.items : [];
+
+      const itemsHTML = items.map(item => `
+        <div class="item">
+          ${escapeHTML(item.name)}
+          — الكمية: ${escapeHTML(item.quantity)}
+          — السعر: ${escapeHTML(item.price)}
+          ${item.notes ? "<br>ملاحظات: " + escapeHTML(item.notes) : ""}
+        </div>
+      `).join("");
+
+      const date = order.createdAt?.toDate
+        ? order.createdAt.toDate().toLocaleString("ar-IQ")
+        : "غير محدد";
+
+      const card = document.createElement("div");
+      card.className = "order";
+
+      card.innerHTML = `
+        <h3>طلب رقم: ${escapeHTML(id)}</h3>
+        <p><b>الزبون:</b> ${escapeHTML(order.customerName)}</p>
+        <p><b>الهاتف:</b> ${escapeHTML(order.customerPhone)}</p>
+        <p><b>العنوان:</b> ${escapeHTML(order.customerAddress)}</p>
+        <p><b>التاريخ:</b> ${escapeHTML(date)}</p>
+        <hr>
+        <b>المنتجات:</b>
+        ${itemsHTML}
+        <hr>
+        <p><b>المجموع:</b> ${escapeHTML(order.total)} دينار</p>
+        <p>الحالة الحالية:
+          <span class="status">${escapeHTML(order.status || "new")}</span>
+        </p>
+        <select class="statusSelect">
+          <option value="new">جديد</option>
+          <option value="preparing">قيد التجهيز</option>
+          <option value="completed">مكتمل</option>
+          <option value="cancelled">ملغي</option>
+        </select>
+        <button class="saveStatus">حفظ حالة الطلب</button>
+      `;
+
+      const select = card.querySelector(".statusSelect");
+      select.value = ["new","preparing","completed","cancelled"]
+        .includes(order.status) ? order.status : "new";
+
+      card.querySelector(".saveStatus").addEventListener("click", async () => {
+        try{
+          await db.collection("orders").doc(id).update({
+            status: select.value
+          });
+          alert("تم تحديث حالة الطلب");
+          loadOrders();
+        }catch(error){
+          alert("تعذر تحديث الطلب: " + error.message);
+        }
+      });
+
+      area.appendChild(card);
+    });
+
+  }catch(error){
+    area.textContent = "حدث خطأ أثناء تحميل الطلبات: " + error.message;
+  }
+}
+</script>
+
+</body>
+</html>
