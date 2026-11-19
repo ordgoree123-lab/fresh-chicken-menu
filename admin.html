@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -31,14 +32,16 @@ header{
   margin-bottom:15px;
   box-shadow:0 2px 8px #0001;
 }
-input,button,select{
+input,button,select,textarea{
   width:100%;
   padding:12px;
   margin:7px 0;
   border:1px solid #ddd;
   border-radius:8px;
   font-size:16px;
+  font-family:Tahoma,Arial;
 }
+textarea{min-height:80px}
 button{
   background:#c8102e;
   color:white;
@@ -46,7 +49,8 @@ button{
   cursor:pointer;
 }
 button.secondary{background:#333}
-.order{
+button.green{background:#168b45}
+.order,.product{
   border:1px solid #ddd;
   border-radius:10px;
   padding:15px;
@@ -66,6 +70,22 @@ button.secondary{background:#333}
   border-radius:6px;
 }
 #message{color:#c8102e}
+.product img{
+  width:100%;
+  max-width:180px;
+  height:120px;
+  object-fit:cover;
+  border-radius:8px;
+}
+.product-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.product-actions button{
+  flex:1;
+  min-width:110px;
+}
 </style>
 </head>
 
@@ -73,7 +93,7 @@ button.secondary{background:#333}
 
 <header>
   <h2>Fresh Chicken</h2>
-  <div>لوحة إدارة الطلبات</div>
+  <div>لوحة الإدارة</div>
 </header>
 
 <div class="container">
@@ -87,16 +107,54 @@ button.secondary{background:#333}
   </div>
 
   <div id="dashboard" class="hidden">
+
+    <!-- إدارة الطلبات -->
     <div class="box">
-      <h3>إدارة الطلبات</h3>
+      <h3>إدارة الطلبات 📦</h3>
       <button onclick="loadOrders()">تحديث الطلبات</button>
-      <button class="secondary" onclick="logout()">تسجيل الخروج</button>
       <p id="count"></p>
     </div>
 
     <div class="box">
       <div id="orders">جارٍ تحميل الطلبات...</div>
     </div>
+
+    <!-- إضافة المنتجات -->
+    <div class="box">
+      <h3>إدارة المنتجات 🍗</h3>
+
+      <h4>إضافة منتج جديد</h4>
+
+      <input id="productName" placeholder="اسم المنتج">
+
+      <input id="productCategory" placeholder="القسم">
+
+      <input id="productPrice" type="number" placeholder="السعر بالدينار">
+
+      <input id="productImage" placeholder="رابط صورة المنتج">
+
+      <textarea id="productDescription"
+        placeholder="وصف المنتج"></textarea>
+
+      <button onclick="addProduct()">إضافة المنتج</button>
+
+      <hr>
+
+      <h4>المنتجات الحالية</h4>
+
+      <button class="secondary" onclick="loadProducts()">
+        تحديث المنتجات
+      </button>
+
+      <div id="productsList">جارٍ تحميل المنتجات...</div>
+    </div>
+
+    <div class="box">
+      <button class="secondary" onclick="logout()">
+        تسجيل الخروج
+      </button>
+    </div>
+
   </div>
 
 </div>
@@ -106,6 +164,7 @@ button.secondary{background:#333}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <script>
+
 const firebaseConfig = {
   apiKey: "AIzaSyAzvEG-JYV2DN30oZGmGM1Wt_HkGqnQqjY",
   authDomain: "fresh-chicken-menu.firebaseapp.com",
@@ -125,15 +184,22 @@ const loginBox = document.getElementById("loginBox");
 const dashboard = document.getElementById("dashboard");
 const message = document.getElementById("message");
 
-
 const ADMIN_UID = "Q5ugDQ5ZJIOpS5tO9ZRHnnvUaTB3";
 
+const productsRef = db.collection("products");
+
 auth.onAuthStateChanged(user => {
+
   if (user && user.uid === ADMIN_UID) {
+
     loginBox.classList.add("hidden");
     dashboard.classList.remove("hidden");
+
     loadOrders();
+    loadProducts();
+
   } else {
+
     loginBox.classList.remove("hidden");
     dashboard.classList.add("hidden");
 
@@ -141,22 +207,29 @@ auth.onAuthStateChanged(user => {
       auth.signOut();
       alert("ليس لديك صلاحية الدخول إلى لوحة الإدارة");
     }
+
   }
+
 });
 
-
 async function login(){
+
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
 
   message.textContent = "جارٍ تسجيل الدخول...";
 
   try{
+
     await auth.signInWithEmailAndPassword(email,password);
     message.textContent = "";
+
   }catch(error){
+
     message.textContent = "تعذر تسجيل الدخول: " + error.message;
+
   }
+
 }
 
 async function logout(){
@@ -164,6 +237,7 @@ async function logout(){
 }
 
 function escapeHTML(value){
+
   return String(value ?? "").replace(/[&<>"']/g, char => ({
     "&":"&amp;",
     "<":"&lt;",
@@ -171,13 +245,20 @@ function escapeHTML(value){
     '"':"&quot;",
     "'":"&#039;"
   })[char]);
+
 }
 
+// ============================
+// إدارة الطلبات
+// ============================
+
 async function loadOrders(){
+
   const area = document.getElementById("orders");
   area.textContent = "جارٍ تحميل الطلبات...";
 
   try{
+
     const snapshot = await db.collection("orders")
       .orderBy("createdAt","desc")
       .get();
@@ -193,6 +274,7 @@ async function loadOrders(){
     area.innerHTML = "";
 
     snapshot.forEach(doc => {
+
       const order = doc.data();
       const id = doc.id;
 
@@ -219,6 +301,7 @@ async function loadOrders(){
         <p><b>الزبون:</b> ${escapeHTML(order.customerName)}</p>
         <p><b>الهاتف:</b> ${escapeHTML(order.customerPhone)}</p>
         <p><b>العنوان:</b> ${escapeHTML(order.customerAddress)}</p>
+        <p><b>ملاحظات:</b> ${escapeHTML(order.notes || "لا توجد")}</p>
         <p><b>التاريخ:</b> ${escapeHTML(date)}</p>
         <hr>
         <b>المنتجات:</b>
@@ -238,28 +321,305 @@ async function loadOrders(){
       `;
 
       const select = card.querySelector(".statusSelect");
+
       select.value = ["new","preparing","completed","cancelled"]
         .includes(order.status) ? order.status : "new";
 
       card.querySelector(".saveStatus").addEventListener("click", async () => {
+
         try{
+
           await db.collection("orders").doc(id).update({
             status: select.value
           });
+
           alert("تم تحديث حالة الطلب");
           loadOrders();
+
         }catch(error){
+
           alert("تعذر تحديث الطلب: " + error.message);
+
         }
+
       });
 
       area.appendChild(card);
+
     });
 
   }catch(error){
-    area.textContent = "حدث خطأ أثناء تحميل الطلبات: " + error.message;
+
+    area.textContent =
+      "حدث خطأ أثناء تحميل الطلبات: " + error.message;
+
   }
+
 }
+
+// ============================
+// إضافة منتج
+// ============================
+
+async function addProduct(){
+
+  const name = document.getElementById("productName").value.trim();
+  const category = document.getElementById("productCategory").value.trim();
+  const price = Number(document.getElementById("productPrice").value);
+  const imageUrl = document.getElementById("productImage").value.trim();
+  const description = document.getElementById("productDescription").value.trim();
+
+  if(!name || !category || !Number.isSafeInteger(price) || price <= 0){
+
+    alert("أدخل اسم المنتج والقسم وسعراً صحيحاً");
+    return;
+
+  }
+
+  if(imageUrl && !/^https?:\/\/\S+$/i.test(imageUrl)){
+    alert("رابط الصورة غير صحيح");
+    return;
+  }
+
+  try{
+
+    await productsRef.add({
+
+      name: name,
+      category: category,
+      price: price,
+      imageUrl: imageUrl,
+      description: description,
+      available: true,
+      featured: false,
+      sortOrder: 0,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+
+    });
+
+    alert("تمت إضافة المنتج بنجاح");
+
+    document.getElementById("productName").value = "";
+    document.getElementById("productCategory").value = "";
+    document.getElementById("productPrice").value = "";
+    document.getElementById("productImage").value = "";
+    document.getElementById("productDescription").value = "";
+
+    loadProducts();
+
+  }catch(error){
+
+    alert("تعذر إضافة المنتج: " + error.message);
+
+  }
+
+}
+
+// ============================
+// عرض المنتجات
+// ============================
+
+async function loadProducts(){
+
+  const list = document.getElementById("productsList");
+
+  list.textContent = "جارٍ تحميل المنتجات...";
+
+  try{
+
+    const snapshot = await productsRef.orderBy("createdAt","desc").get();
+
+    if(snapshot.empty){
+
+      list.textContent = "لا توجد منتجات حالياً.";
+      return;
+
+    }
+
+    list.innerHTML = "";
+
+    snapshot.forEach(doc => {
+
+      const p = doc.data();
+
+      const item = document.createElement("div");
+      item.className = "product";
+
+      const title = document.createElement("h3");
+      title.textContent = p.name || "منتج بدون اسم";
+
+      const category = document.createElement("p");
+      category.textContent = "القسم: " + (p.category || "");
+
+      const price = document.createElement("p");
+      price.textContent = "السعر: " + (p.price || 0) + " د.ع";
+
+      const status = document.createElement("p");
+      status.textContent =
+        p.available === false ? "الحالة: غير متوفر" : "الحالة: متوفر";
+
+      item.append(title, category, price, status);
+
+      if(p.imageUrl && /^https?:\/\//i.test(p.imageUrl)){
+
+        const img = document.createElement("img");
+        img.src = p.imageUrl;
+        img.alt = p.name || "صورة المنتج";
+        img.loading = "lazy";
+        item.appendChild(img);
+
+      }
+
+      const description = document.createElement("p");
+      description.textContent = p.description || "لا يوجد وصف";
+      item.appendChild(description);
+
+      const actions = document.createElement("div");
+      actions.className = "product-actions";
+
+      const edit = document.createElement("button");
+      edit.textContent = "تعديل المنتج";
+
+      edit.onclick = () => editProduct(doc.id, p);
+
+      const toggle = document.createElement("button");
+      toggle.className = "green";
+      toggle.textContent =
+        p.available === false ? "إظهار المنتج" : "إخفاء المنتج";
+
+      toggle.onclick = () => toggleProduct(doc.id, p.available);
+
+      const remove = document.createElement("button");
+      remove.className = "secondary";
+      remove.textContent = "حذف المنتج";
+
+      remove.onclick = () => deleteProduct(doc.id);
+
+      actions.append(edit, toggle, remove);
+      item.appendChild(actions);
+
+      list.appendChild(item);
+
+    });
+
+  }catch(error){
+
+    list.textContent =
+      "خطأ في تحميل المنتجات: " + error.message;
+
+  }
+
+}
+
+// ============================
+// تعديل منتج
+// ============================
+
+async function editProduct(id, product){
+
+  const name = prompt("اسم المنتج:", product.name || "");
+  if(name === null) return;
+
+  const category = prompt("القسم:", product.category || "");
+  if(category === null) return;
+
+  const priceText = prompt("السعر بالدينار:", product.price || "");
+  if(priceText === null) return;
+
+  const price = Number(priceText);
+
+  const imageUrl = prompt("رابط الصورة:", product.imageUrl || "");
+  if(imageUrl === null) return;
+
+  const description = prompt("وصف المنتج:", product.description || "");
+  if(description === null) return;
+
+  if(!name.trim() || !category.trim() ||
+     !Number.isSafeInteger(price) || price <= 0){
+
+    alert("البيانات غير صحيحة");
+    return;
+
+  }
+
+  if(imageUrl.trim() && !/^https?:\/\/\S+$/i.test(imageUrl.trim())){
+    alert("رابط الصورة غير صحيح");
+    return;
+  }
+
+  try{
+
+    await productsRef.doc(id).update({
+
+      name: name.trim(),
+      category: category.trim(),
+      price: price,
+      imageUrl: imageUrl.trim(),
+      description: description.trim(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+
+    });
+
+    alert("تم تعديل المنتج");
+    loadProducts();
+
+  }catch(error){
+
+    alert("تعذر تعديل المنتج: " + error.message);
+
+  }
+
+}
+
+// ============================
+// إخفاء وإظهار منتج
+// ============================
+
+async function toggleProduct(id, currentStatus){
+
+  try{
+
+    await productsRef.doc(id).update({
+
+      available: currentStatus === false,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+
+    });
+
+    loadProducts();
+
+  }catch(error){
+
+    alert("تعذر تغيير حالة المنتج: " + error.message);
+
+  }
+
+}
+
+// ============================
+// حذف منتج
+// ============================
+
+async function deleteProduct(id){
+
+  if(!confirm("هل أنت متأكد من حذف هذا المنتج؟")) return;
+
+  try{
+
+    await productsRef.doc(id).delete();
+
+    alert("تم حذف المنتج");
+    loadProducts();
+
+  }catch(error){
+
+    alert("تعذر حذف المنتج: " + error.message);
+
+  }
+
+}
+
 </script>
 
 </body>
