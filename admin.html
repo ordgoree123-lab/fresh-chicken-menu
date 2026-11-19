@@ -1,103 +1,36 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fresh Chicken | لوحة الإدارة</title>
-
 <style>
 *{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:Tahoma,Arial;
-  background:#f4f4f4;
-  color:#222;
-}
-header{
-  background:#c8102e;
-  color:white;
-  padding:20px;
-  text-align:center;
-}
-.container{
-  max-width:1000px;
-  margin:20px auto;
-  padding:15px;
-}
-.box{
-  background:white;
-  padding:20px;
-  border-radius:12px;
-  margin-bottom:15px;
-  box-shadow:0 2px 8px #0001;
-}
-input,button,select,textarea{
-  width:100%;
-  padding:12px;
-  margin:7px 0;
-  border:1px solid #ddd;
-  border-radius:8px;
-  font-size:16px;
-  font-family:Tahoma,Arial;
-}
+body{margin:0;font-family:Tahoma,Arial;background:#f4f4f4;color:#222}
+header{background:#c8102e;color:white;padding:20px;text-align:center}
+.container{max-width:1000px;margin:20px auto;padding:15px}
+.box{background:white;padding:20px;border-radius:12px;margin-bottom:15px;box-shadow:0 2px 8px #0001}
+input,button,select,textarea{width:100%;padding:12px;margin:7px 0;border:1px solid #ddd;border-radius:8px;font-size:16px;font-family:Tahoma,Arial}
 textarea{min-height:80px}
-button{
-  background:#c8102e;
-  color:white;
-  border:0;
-  cursor:pointer;
-}
+button{background:#c8102e;color:white;border:0;cursor:pointer}
 button.secondary{background:#333}
 button.green{background:#168b45}
-.order,.product{
-  border:1px solid #ddd;
-  border-radius:10px;
-  padding:15px;
-  margin:12px 0;
-}
+.order,.product{border:1px solid #ddd;border-radius:10px;padding:15px;margin:12px 0}
 .order h3{margin-top:0;color:#c8102e}
 .muted{color:#777;font-size:13px}
 .hidden{display:none}
-.status{
-  font-weight:bold;
-  color:#c8102e;
-}
-.item{
-  background:#f7f7f7;
-  padding:8px;
-  margin:5px 0;
-  border-radius:6px;
-}
+.status{font-weight:bold;color:#c8102e}
+.item{background:#f7f7f7;padding:8px;margin:5px 0;border-radius:6px}
 #message{color:#c8102e}
-.product img{
-  width:100%;
-  max-width:180px;
-  height:120px;
-  object-fit:cover;
-  border-radius:8px;
-}
-.product-actions{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-}
-.product-actions button{
-  flex:1;
-  min-width:110px;
-}
+.product img{width:100%;max-width:180px;height:120px;object-fit:cover;border-radius:8px}
+.product-actions{display:flex;gap:8px;flex-wrap:wrap}
+.product-actions button{flex:1;min-width:110px}
+#importMessage{font-size:14px;line-height:1.7}
 </style>
 </head>
-
 <body>
-
-<header>
-  <h2>Fresh Chicken</h2>
-  <div>لوحة الإدارة</div>
-</header>
-
+<header><h2>Fresh Chicken</h2><div>لوحة الإدارة</div></header>
 <div class="container">
-
   <div class="box" id="loginBox">
     <h3>تسجيل دخول الإدارة</h3>
     <input id="email" type="email" placeholder="البريد الإلكتروني">
@@ -105,66 +38,39 @@ button.green{background:#168b45}
     <button onclick="login()">تسجيل الدخول</button>
     <p id="message"></p>
   </div>
-
   <div id="dashboard" class="hidden">
-
-    <!-- إدارة الطلبات -->
     <div class="box">
       <h3>إدارة الطلبات 📦</h3>
       <button onclick="loadOrders()">تحديث الطلبات</button>
       <p id="count"></p>
     </div>
-
-    <div class="box">
-      <div id="orders">جارٍ تحميل الطلبات...</div>
-    </div>
-
-    <!-- إضافة المنتجات -->
+    <div class="box"><div id="orders">جارٍ تحميل الطلبات...</div></div>
     <div class="box">
       <h3>إدارة المنتجات 🍗</h3>
-
       <h4>إضافة منتج جديد</h4>
-
       <input id="productName" placeholder="اسم المنتج">
-
       <input id="productCategory" placeholder="القسم">
-
       <input id="productPrice" type="number" placeholder="السعر بالدينار">
-
       <input id="productImage" placeholder="رابط صورة المنتج">
-
-      <textarea id="productDescription"
-        placeholder="وصف المنتج"></textarea>
-
+      <textarea id="productDescription" placeholder="وصف المنتج"></textarea>
       <button onclick="addProduct()">إضافة المنتج</button>
-
       <hr>
-
+      <h4>نقل المنتجات القديمة</h4>
+      <p class="muted">ينقل قائمة المنتجات القديمة إلى قاعدة البيانات مرة واحدة. لن يحذف أو يعدّل المنتجات الموجودة حالياً، بما فيها المنتج التجريبي.</p>
+      <button class="green" id="importButton" onclick="importOldProducts()">نقل المنتجات القديمة إلى قاعدة البيانات</button>
+      <p id="importMessage"></p>
+      <hr>
       <h4>المنتجات الحالية</h4>
-
-      <button class="secondary" onclick="loadProducts()">
-        تحديث المنتجات
-      </button>
-
+      <button class="secondary" onclick="loadProducts()">تحديث المنتجات</button>
       <div id="productsList">جارٍ تحميل المنتجات...</div>
     </div>
-
-    <div class="box">
-      <button class="secondary" onclick="logout()">
-        تسجيل الخروج
-      </button>
-    </div>
-
+    <div class="box"><button class="secondary" onclick="logout()">تسجيل الخروج</button></div>
   </div>
-
 </div>
-
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
 <script>
-
 const firebaseConfig = {
   apiKey: "AIzaSyAzvEG-JYV2DN30oZGmGM1Wt_HkGqnQqjY",
   authDomain: "fresh-chicken-menu.firebaseapp.com",
@@ -174,453 +80,278 @@ const firebaseConfig = {
   appId: "1:353092642080:web:153c93521ed13ba2d12345",
   measurementId: "G-V3BQ6YTRCN"
 };
-
 firebase.initializeApp(firebaseConfig);
-
 const auth = firebase.auth();
 const db = firebase.firestore();
-
 const loginBox = document.getElementById("loginBox");
 const dashboard = document.getElementById("dashboard");
 const message = document.getElementById("message");
-
 const ADMIN_UID = "Q5ugDQ5ZJIOpS5tO9ZRHnnvUaTB3";
-
 const productsRef = db.collection("products");
+const MIGRATION_MARKER_ID = "legacy_migration_marker";
 
 auth.onAuthStateChanged(user => {
-
-  if (user && user.uid === ADMIN_UID) {
-
+  if(user && user.uid === ADMIN_UID){
     loginBox.classList.add("hidden");
     dashboard.classList.remove("hidden");
-
     loadOrders();
     loadProducts();
-
-  } else {
-
+    checkMigrationStatus();
+  }else{
     loginBox.classList.remove("hidden");
     dashboard.classList.add("hidden");
-
-    if (user) {
-      auth.signOut();
-      alert("ليس لديك صلاحية الدخول إلى لوحة الإدارة");
-    }
-
+    if(user){auth.signOut();alert("ليس لديك صلاحية الدخول إلى لوحة الإدارة");}
   }
-
 });
 
 async function login(){
-
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
-
-  message.textContent = "جارٍ تسجيل الدخول...";
-
-  try{
-
-    await auth.signInWithEmailAndPassword(email,password);
-    message.textContent = "";
-
-  }catch(error){
-
-    message.textContent = "تعذر تسجيل الدخول: " + error.message;
-
-  }
-
+  const email=document.getElementById("email").value.trim();
+  const password=document.getElementById("password").value;
+  message.textContent="جارٍ تسجيل الدخول...";
+  try{await auth.signInWithEmailAndPassword(email,password);message.textContent="";}
+  catch(error){message.textContent="تعذر تسجيل الدخول: "+error.message;}
 }
-
-async function logout(){
-  await auth.signOut();
-}
-
+async function logout(){await auth.signOut();}
 function escapeHTML(value){
-
-  return String(value ?? "").replace(/[&<>"']/g, char => ({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#039;"
-  })[char]);
-
+  return String(value ?? "").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[char]));
 }
 
-// ============================
-// إدارة الطلبات
-// ============================
+// المنتجات القديمة وصورها الافتراضية حسب القسم
+const categoryImages = {
+  "كنتاكي":"https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=900&q=80",
+  "بيتزا":"https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=900&q=80",
+  "شاورما":"https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=900&q=80",
+  "برغر":"https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=900&q=80",
+  "ساندويش":"https://images.unsplash.com/photo-1553909489-cd47e0ef937f?auto=format&fit=crop&w=900&q=80",
+  "فرايز":"https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=900&q=80",
+  "ريزو":"https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=900&q=80",
+  "فنكر":"https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=900&q=80",
+  "ستربس":"https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=900&q=80",
+  "مقبلات":"https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
+  "صاج إيطالي":"https://images.unsplash.com/photo-1553909489-cd47e0ef937f?auto=format&fit=crop&w=900&q=80"
+};
+const fallbackImage="https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80";
 
-async function loadOrders(){
+const legacyProducts = [
+["كنتاكي","وجبة كنتاكي قطعتين",5000],["كنتاكي","وجبة كنتاكي 3 قطع",7000],
+["كنتاكي","وجبة كنتاكي 5 قطع",12000],["كنتاكي","وجبة كنتاكي 8 قطع",18000],
+["كنتاكي","وجبة كنتاكي 10 قطع",20000],
+["برغر","بركر لحم",3500],["برغر","بركر دجاج بالجبن",3500],
+["برغر","بركر دجاج مدخن",3500],["برغر","بركر دجاج",3500],
+["برغر","بركر لحم بالجبن",4000],["برغر","بركر لحم مدخن",4000],
+["برغر","بركر لحم دبل",6000],["برغر","بركر دجاج دبل",6000],["برغر","سماش بركر",5000],
+["ساندويش","زنجر",3500],["ساندويش","زنجر سبايسي",3500],["ساندويش","زنجر مدخن",3500],
+["ساندويش","فلر",3500],["ساندويش","تويستر",4000],["ساندويش","تويستر مدخن",4500],
+["ساندويش","تويستر بالجبن",4500],["ساندويش","فاهيتا دجاج",4000],["ساندويش","فاهيتا لحم",5000],
+["فرايز","فرايز مدخن",5000],["فرايز","فرايز كلاسيك",5000],["فرايز","فرايز هالينو",5000],
+["فرايز","فرايز ماكس",5000],["فرايز","فرايز دوريتوس",5000],["فرايز","فرايز باجبن",5000],
+["ريزو","ريزو شاورما دجاج",5000],["ريزو","ريزو بالجبن",5000],["ريزو","ريزو أعشاب",5000],
+["ريزو","ريزو كلاسيك",5000],["ريزو","ريزو سبايسي",5000],["ريزو","ريزو شاورما لحم",6000],
+["ريزو","ريزو مدخن",5000],
+["فنكر","كلاس فنكر",1500],["فنكر","فنكر كلاسيك",2000],["فنكر","فنكر بالجبن",2500],
+["ستربس","ستربس 3 قطع",5000],["ستربس","ستربس 6 قطع",10000],
+["ستربس","ستربس 8 قطع",15000],["ستربس","ستربس 12 قطعة",18000],
+["مقبلات","مقبلات صغير",1500],["مقبلات","مقبلات وسط",3000],["مقبلات","مقبلات كبير",4000],
+["شاورما","ساندويش شاورما دجاج",2500],["شاورما","ساندويش شاورما لحم",3000],
+["شاورما","صاج دجاج",2500],["شاورما","صاج لحم",3000],
+["شاورما","ربع نفر شاورما دجاج",6000],["شاورما","نص نفر شاورما دجاج",12000],
+["شاورما","نفر شاورما دجاج",24000],["شاورما","ربع نفر شاورما لحم",8000],
+["شاورما","نص نفر شاورما لحم",17000],["شاورما","نفر شاورما لحم",35000],
+["صاج إيطالي","صاج إيطالي دجاج",5000],["صاج إيطالي","صاج إيطالي لحم",5500],
+["صاج إيطالي","لفم دجاج",5000],["صاج إيطالي","لفم لحم",6000],
+["بيتزا","بيتزا لحم - صغير",7000],["بيتزا","بيتزا لحم - وسط",11000],
+["بيتزا","بيتزا لحم - كبير",13000],["بيتزا","بيتزا دجاج - صغير",6000],
+["بيتزا","بيتزا دجاج - وسط",9000],["بيتزا","بيتزا دجاج - كبير",12000],
+["بيتزا","بيتزا خضروات - صغير",5000],["بيتزا","بيتزا خضروات - وسط",7000],
+["بيتزا","بيتزا خضروات - كبير",10000],["بيتزا","بيتزا مشكل - صغير",7000],
+["بيتزا","بيتزا مشكل - وسط",11000],["بيتزا","بيتزا مشكل - كبير",13000],
+["بيتزا","بيتزا مارغريتا - صغير",5000],["بيتزا","بيتزا مارغريتا - وسط",7000],
+["بيتزا","بيتزا مارغريتا - كبير",10000],["بيتزا","بيتزا فريش تشكن - صغير",7000],
+["بيتزا","بيتزا فريش تشكن - وسط",10000],["بيتزا","بيتزا فريش تشكن - كبير",13000],
+["بيتزا","بيتزا بيبروني - صغير",5000],["بيتزا","بيتزا بيبروني - وسط",7000],
+["بيتزا","بيتزا بيبروني - كبير",10000]
+];
 
-  const area = document.getElementById("orders");
-  area.textContent = "جارٍ تحميل الطلبات...";
-
+async function checkMigrationStatus(){
+  const button=document.getElementById("importButton");
+  const info=document.getElementById("importMessage");
   try{
+    const marker=await productsRef.doc(MIGRATION_MARKER_ID).get();
+    if(marker.exists){
+      button.disabled=true;
+      button.textContent="تم نقل المنتجات القديمة مسبقاً";
+      info.textContent="تم تسجيل عملية النقل مسبقاً. لن تتكرر العملية.";
+    }else{
+      button.disabled=false;
+      button.textContent="نقل المنتجات القديمة إلى قاعدة البيانات";
+      info.textContent="لم يتم نقل القائمة القديمة بعد.";
+    }
+  }catch(error){
+    info.textContent="تعذر التحقق من حالة النقل: "+error.message;
+  }
+}
 
-    const snapshot = await db.collection("orders")
-      .orderBy("createdAt","desc")
-      .get();
-
-    document.getElementById("count").textContent =
-      "عدد الطلبات: " + snapshot.size;
-
-    if(snapshot.empty){
-      area.textContent = "لا توجد طلبات حالياً.";
+async function importOldProducts(){
+  const button=document.getElementById("importButton");
+  const info=document.getElementById("importMessage");
+  if(!auth.currentUser || auth.currentUser.uid!==ADMIN_UID){
+    alert("يجب تسجيل الدخول بحساب المدير أولاً.");return;
+  }
+  const confirmed=confirm("سيتم نقل "+legacyProducts.length+" منتجاً إلى Firestore. لن يتم حذف أو تعديل المنتجات الموجودة. هل تريد المتابعة؟");
+  if(!confirmed)return;
+  button.disabled=true;
+  info.textContent="جارٍ نقل المنتجات... يرجى عدم إغلاق الصفحة.";
+  try{
+    const markerRef=productsRef.doc(MIGRATION_MARKER_ID);
+    const marker=await markerRef.get();
+    if(marker.exists){
+      info.textContent="سبق نقل المنتجات القديمة. لم يتم إجراء أي تغيير.";
+      button.textContent="تم نقل المنتجات القديمة مسبقاً";
       return;
     }
+    const batch=db.batch();
+    const now=firebase.firestore.FieldValue.serverTimestamp();
+    legacyProducts.forEach((row,index)=>{
+      const [category,name,price]=row;
+      const id="legacy_"+String(index+1).padStart(3,"0");
+      batch.set(productsRef.doc(id),{
+        name,category,price,
+        imageUrl:categoryImages[category]||fallbackImage,
+        description:"",
+        available:true,
+        featured:false,
+        sortOrder:index+1,
+        legacyImported:true,
+        createdAt:now,
+        updatedAt:now
+      });
+    });
+    batch.set(markerRef,{
+      isMigrationMarker:true,
+      migrationName:"legacyProducts",
+      importedCount:legacyProducts.length,
+      completedAt:now
+    });
+    await batch.commit();
+    info.textContent="نجح النقل! تمت إضافة "+legacyProducts.length+" منتجاً. حدّث قائمة المنتجات للتحقق.";
+    button.textContent="تم نقل المنتجات القديمة";
+    await loadProducts();
+  }catch(error){
+    button.disabled=false;
+    info.textContent="تعذر إكمال النقل: "+error.message+" — لم نؤكد نجاح العملية. افحص حالة النقل قبل إعادة المحاولة.";
+  }
+}
 
-    area.innerHTML = "";
-
-    snapshot.forEach(doc => {
-
-      const order = doc.data();
-      const id = doc.id;
-
-      const items = Array.isArray(order.items) ? order.items : [];
-
-      const itemsHTML = items.map(item => `
-        <div class="item">
-          ${escapeHTML(item.name)}
-          — الكمية: ${escapeHTML(item.quantity)}
-          — السعر: ${escapeHTML(item.price)}
-          ${item.notes ? "<br>ملاحظات: " + escapeHTML(item.notes) : ""}
-        </div>
-      `).join("");
-
-      const date = order.createdAt?.toDate
-        ? order.createdAt.toDate().toLocaleString("ar-IQ")
-        : "غير محدد";
-
-      const card = document.createElement("div");
-      card.className = "order";
-
-      card.innerHTML = `
+// إدارة الطلبات
+async function loadOrders(){
+  const area=document.getElementById("orders");
+  area.textContent="جارٍ تحميل الطلبات...";
+  try{
+    const snapshot=await db.collection("orders").orderBy("createdAt","desc").get();
+    document.getElementById("count").textContent="عدد الطلبات: "+snapshot.size;
+    if(snapshot.empty){area.textContent="لا توجد طلبات حالياً.";return;}
+    area.innerHTML="";
+    snapshot.forEach(doc=>{
+      const order=doc.data(),id=doc.id;
+      const items=Array.isArray(order.items)?order.items:[];
+      const itemsHTML=items.map(item=>`<div class="item">${escapeHTML(item.name)} — الكمية: ${escapeHTML(item.quantity)} — السعر: ${escapeHTML(item.price)} ${item.notes?"<br>ملاحظات: "+escapeHTML(item.notes):""}</div>`).join("");
+      const date=order.createdAt?.toDate?order.createdAt.toDate().toLocaleString("ar-IQ"):"غير محدد";
+      const card=document.createElement("div");card.className="order";
+      card.innerHTML=`
         <h3>طلب رقم: ${escapeHTML(id)}</h3>
         <p><b>الزبون:</b> ${escapeHTML(order.customerName)}</p>
         <p><b>الهاتف:</b> ${escapeHTML(order.customerPhone)}</p>
         <p><b>العنوان:</b> ${escapeHTML(order.customerAddress)}</p>
-        <p><b>ملاحظات:</b> ${escapeHTML(order.notes || "لا توجد")}</p>
-        <p><b>التاريخ:</b> ${escapeHTML(date)}</p>
-        <hr>
-        <b>المنتجات:</b>
-        ${itemsHTML}
-        <hr>
+        <p><b>ملاحظات:</b> ${escapeHTML(order.notes||"لا توجد")}</p>
+        <p><b>التاريخ:</b> ${escapeHTML(date)}</p><hr><b>المنتجات:</b>${itemsHTML}<hr>
         <p><b>المجموع:</b> ${escapeHTML(order.total)} دينار</p>
-        <p>الحالة الحالية:
-          <span class="status">${escapeHTML(order.status || "new")}</span>
-        </p>
+        <p>الحالة الحالية: <span class="status">${escapeHTML(order.status||"new")}</span></p>
         <select class="statusSelect">
-          <option value="new">جديد</option>
-          <option value="preparing">قيد التجهيز</option>
-          <option value="completed">مكتمل</option>
-          <option value="cancelled">ملغي</option>
-        </select>
-        <button class="saveStatus">حفظ حالة الطلب</button>
-      `;
-
-      const select = card.querySelector(".statusSelect");
-
-      select.value = ["new","preparing","completed","cancelled"]
-        .includes(order.status) ? order.status : "new";
-
-      card.querySelector(".saveStatus").addEventListener("click", async () => {
-
-        try{
-
-          await db.collection("orders").doc(id).update({
-            status: select.value
-          });
-
-          alert("تم تحديث حالة الطلب");
-          loadOrders();
-
-        }catch(error){
-
-          alert("تعذر تحديث الطلب: " + error.message);
-
-        }
-
+          <option value="new">جديد</option><option value="preparing">قيد التجهيز</option>
+          <option value="completed">مكتمل</option><option value="cancelled">ملغي</option>
+        </select><button class="saveStatus">حفظ حالة الطلب</button>`;
+      const select=card.querySelector(".statusSelect");
+      select.value=["new","preparing","completed","cancelled"].includes(order.status)?order.status:"new";
+      card.querySelector(".saveStatus").addEventListener("click",async()=>{
+        try{await db.collection("orders").doc(id).update({status:select.value});alert("تم تحديث حالة الطلب");loadOrders();}
+        catch(error){alert("تعذر تحديث الطلب: "+error.message);}
       });
-
       area.appendChild(card);
-
     });
-
-  }catch(error){
-
-    area.textContent =
-      "حدث خطأ أثناء تحميل الطلبات: " + error.message;
-
-  }
-
+  }catch(error){area.textContent="حدث خطأ أثناء تحميل الطلبات: "+error.message;}
 }
 
-// ============================
 // إضافة منتج
-// ============================
-
 async function addProduct(){
-
-  const name = document.getElementById("productName").value.trim();
-  const category = document.getElementById("productCategory").value.trim();
-  const price = Number(document.getElementById("productPrice").value);
-  const imageUrl = document.getElementById("productImage").value.trim();
-  const description = document.getElementById("productDescription").value.trim();
-
-  if(!name || !category || !Number.isSafeInteger(price) || price <= 0){
-
-    alert("أدخل اسم المنتج والقسم وسعراً صحيحاً");
-    return;
-
-  }
-
-  if(imageUrl && !/^https?:\/\/\S+$/i.test(imageUrl)){
-    alert("رابط الصورة غير صحيح");
-    return;
-  }
-
+  const name=document.getElementById("productName").value.trim();
+  const category=document.getElementById("productCategory").value.trim();
+  const price=Number(document.getElementById("productPrice").value);
+  const imageUrl=document.getElementById("productImage").value.trim();
+  const description=document.getElementById("productDescription").value.trim();
+  if(!name||!category||!Number.isSafeInteger(price)||price<=0){alert("أدخل اسم المنتج والقسم وسعراً صحيحاً");return;}
+  if(imageUrl&&!/^https?:\/\/\S+$/i.test(imageUrl)){alert("رابط الصورة غير صحيح");return;}
   try{
-
-    await productsRef.add({
-
-      name: name,
-      category: category,
-      price: price,
-      imageUrl: imageUrl,
-      description: description,
-      available: true,
-      featured: false,
-      sortOrder: 0,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-
-    });
-
+    await productsRef.add({name,category,price,imageUrl,description,available:true,featured:false,sortOrder:0,createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
     alert("تمت إضافة المنتج بنجاح");
-
-    document.getElementById("productName").value = "";
-    document.getElementById("productCategory").value = "";
-    document.getElementById("productPrice").value = "";
-    document.getElementById("productImage").value = "";
-    document.getElementById("productDescription").value = "";
-
+    ["productName","productCategory","productPrice","productImage","productDescription"].forEach(id=>document.getElementById(id).value="");
     loadProducts();
-
-  }catch(error){
-
-    alert("تعذر إضافة المنتج: " + error.message);
-
-  }
-
+  }catch(error){alert("تعذر إضافة المنتج: "+error.message);}
 }
 
-// ============================
 // عرض المنتجات
-// ============================
-
 async function loadProducts(){
-
-  const list = document.getElementById("productsList");
-
-  list.textContent = "جارٍ تحميل المنتجات...";
-
+  const list=document.getElementById("productsList");list.textContent="جارٍ تحميل المنتجات...";
   try{
-
-    const snapshot = await productsRef.orderBy("createdAt","desc").get();
-
-    if(snapshot.empty){
-
-      list.textContent = "لا توجد منتجات حالياً.";
-      return;
-
-    }
-
-    list.innerHTML = "";
-
-    snapshot.forEach(doc => {
-
-      const p = doc.data();
-
-      const item = document.createElement("div");
-      item.className = "product";
-
-      const title = document.createElement("h3");
-      title.textContent = p.name || "منتج بدون اسم";
-
-      const category = document.createElement("p");
-      category.textContent = "القسم: " + (p.category || "");
-
-      const price = document.createElement("p");
-      price.textContent = "السعر: " + (p.price || 0) + " د.ع";
-
-      const status = document.createElement("p");
-      status.textContent =
-        p.available === false ? "الحالة: غير متوفر" : "الحالة: متوفر";
-
-      item.append(title, category, price, status);
-
-      if(p.imageUrl && /^https?:\/\//i.test(p.imageUrl)){
-
-        const img = document.createElement("img");
-        img.src = p.imageUrl;
-        img.alt = p.name || "صورة المنتج";
-        img.loading = "lazy";
-        item.appendChild(img);
-
-      }
-
-      const description = document.createElement("p");
-      description.textContent = p.description || "لا يوجد وصف";
-      item.appendChild(description);
-
-      const actions = document.createElement("div");
-      actions.className = "product-actions";
-
-      const edit = document.createElement("button");
-      edit.textContent = "تعديل المنتج";
-
-      edit.onclick = () => editProduct(doc.id, p);
-
-      const toggle = document.createElement("button");
-      toggle.className = "green";
-      toggle.textContent =
-        p.available === false ? "إظهار المنتج" : "إخفاء المنتج";
-
-      toggle.onclick = () => toggleProduct(doc.id, p.available);
-
-      const remove = document.createElement("button");
-      remove.className = "secondary";
-      remove.textContent = "حذف المنتج";
-
-      remove.onclick = () => deleteProduct(doc.id);
-
-      actions.append(edit, toggle, remove);
-      item.appendChild(actions);
-
-      list.appendChild(item);
-
+    const snapshot=await productsRef.orderBy("createdAt","desc").get();
+    const productDocs=snapshot.docs.filter(doc=>!doc.data().isMigrationMarker);
+    if(productDocs.length===0){list.textContent="لا توجد منتجات حالياً.";return;}
+    list.innerHTML="";
+    productDocs.forEach(doc=>{
+      const p=doc.data(),item=document.createElement("div");item.className="product";
+      const title=document.createElement("h3");title.textContent=p.name||"منتج بدون اسم";
+      const category=document.createElement("p");category.textContent="القسم: "+(p.category||"");
+      const price=document.createElement("p");price.textContent="السعر: "+(p.price||0)+" د.ع";
+      const status=document.createElement("p");status.textContent=p.available===false?"الحالة: غير متوفر":"الحالة: متوفر";
+      item.append(title,category,price,status);
+      if(p.imageUrl&&/^https?:\/\//i.test(p.imageUrl)){const img=document.createElement("img");img.src=p.imageUrl;img.alt=p.name||"صورة المنتج";img.loading="lazy";item.appendChild(img);}
+      const description=document.createElement("p");description.textContent=p.description||"لا يوجد وصف";item.appendChild(description);
+      const actions=document.createElement("div");actions.className="product-actions";
+      const edit=document.createElement("button");edit.textContent="تعديل المنتج";edit.onclick=()=>editProduct(doc.id,p);
+      const toggle=document.createElement("button");toggle.className="green";toggle.textContent=p.available===false?"إظهار المنتج":"إخفاء المنتج";toggle.onclick=()=>toggleProduct(doc.id,p.available);
+      const remove=document.createElement("button");remove.className="secondary";remove.textContent="حذف المنتج";remove.onclick=()=>deleteProduct(doc.id);
+      actions.append(edit,toggle,remove);item.appendChild(actions);list.appendChild(item);
     });
-
-  }catch(error){
-
-    list.textContent =
-      "خطأ في تحميل المنتجات: " + error.message;
-
-  }
-
+  }catch(error){list.textContent="خطأ في تحميل المنتجات: "+error.message;}
 }
 
-// ============================
 // تعديل منتج
-// ============================
-
-async function editProduct(id, product){
-
-  const name = prompt("اسم المنتج:", product.name || "");
-  if(name === null) return;
-
-  const category = prompt("القسم:", product.category || "");
-  if(category === null) return;
-
-  const priceText = prompt("السعر بالدينار:", product.price || "");
-  if(priceText === null) return;
-
-  const price = Number(priceText);
-
-  const imageUrl = prompt("رابط الصورة:", product.imageUrl || "");
-  if(imageUrl === null) return;
-
-  const description = prompt("وصف المنتج:", product.description || "");
-  if(description === null) return;
-
-  if(!name.trim() || !category.trim() ||
-     !Number.isSafeInteger(price) || price <= 0){
-
-    alert("البيانات غير صحيحة");
-    return;
-
-  }
-
-  if(imageUrl.trim() && !/^https?:\/\/\S+$/i.test(imageUrl.trim())){
-    alert("رابط الصورة غير صحيح");
-    return;
-  }
-
+async function editProduct(id,product){
+  const name=prompt("اسم المنتج:",product.name||"");if(name===null)return;
+  const category=prompt("القسم:",product.category||"");if(category===null)return;
+  const priceText=prompt("السعر بالدينار:",product.price||"");if(priceText===null)return;
+  const price=Number(priceText);
+  const imageUrl=prompt("رابط الصورة:",product.imageUrl||"");if(imageUrl===null)return;
+  const description=prompt("وصف المنتج:",product.description||"");if(description===null)return;
+  if(!name.trim()||!category.trim()||!Number.isSafeInteger(price)||price<=0){alert("البيانات غير صحيحة");return;}
+  if(imageUrl.trim()&&!/^https?:\/\/\S+$/i.test(imageUrl.trim())){alert("رابط الصورة غير صحيح");return;}
   try{
-
-    await productsRef.doc(id).update({
-
-      name: name.trim(),
-      category: category.trim(),
-      price: price,
-      imageUrl: imageUrl.trim(),
-      description: description.trim(),
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-
-    });
-
-    alert("تم تعديل المنتج");
-    loadProducts();
-
-  }catch(error){
-
-    alert("تعذر تعديل المنتج: " + error.message);
-
-  }
-
+    await productsRef.doc(id).update({name:name.trim(),category:category.trim(),price,imageUrl:imageUrl.trim(),description:description.trim(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+    alert("تم تعديل المنتج");loadProducts();
+  }catch(error){alert("تعذر تعديل المنتج: "+error.message);}
 }
 
-// ============================
 // إخفاء وإظهار منتج
-// ============================
-
-async function toggleProduct(id, currentStatus){
-
-  try{
-
-    await productsRef.doc(id).update({
-
-      available: currentStatus === false,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-
-    });
-
-    loadProducts();
-
-  }catch(error){
-
-    alert("تعذر تغيير حالة المنتج: " + error.message);
-
-  }
-
+async function toggleProduct(id,currentStatus){
+  try{await productsRef.doc(id).update({available:currentStatus===false,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});loadProducts();}
+  catch(error){alert("تعذر تغيير حالة المنتج: "+error.message);}
 }
 
-// ============================
 // حذف منتج
-// ============================
-
 async function deleteProduct(id){
-
-  if(!confirm("هل أنت متأكد من حذف هذا المنتج؟")) return;
-
-  try{
-
-    await productsRef.doc(id).delete();
-
-    alert("تم حذف المنتج");
-    loadProducts();
-
-  }catch(error){
-
-    alert("تعذر حذف المنتج: " + error.message);
-
-  }
-
+  if(!confirm("هل أنت متأكد من حذف هذا المنتج؟"))return;
+  try{await productsRef.doc(id).delete();alert("تم حذف المنتج");loadProducts();}
+  catch(error){alert("تعذر حذف المنتج: "+error.message);}
 }
-
 </script>
-
 </body>
 </html>
