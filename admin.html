@@ -125,16 +125,25 @@ const loginBox = document.getElementById("loginBox");
 const dashboard = document.getElementById("dashboard");
 const message = document.getElementById("message");
 
+
+const ADMIN_UID = "Q5ugDQ5ZJIOpS5tO9ZRHnnvUaTB3";
+
 auth.onAuthStateChanged(user => {
-  if(user){
+  if (user && user.uid === ADMIN_UID) {
     loginBox.classList.add("hidden");
     dashboard.classList.remove("hidden");
     loadOrders();
-  }else{
+  } else {
     loginBox.classList.remove("hidden");
     dashboard.classList.add("hidden");
+
+    if (user) {
+      auth.signOut();
+      alert("ليس لديك صلاحية الدخول إلى لوحة الإدارة");
+    }
   }
 });
+
 
 async function login(){
   const email = document.getElementById("email").value.trim();
