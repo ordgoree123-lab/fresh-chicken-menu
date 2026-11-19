@@ -1,163 +1,318 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#c8102e">
-  <title>Fresh Chicken | المنيو الإلكتروني</title>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#c8102e">
+<title>Fresh Chicken | المنيو</title>
 
-    body {
-      margin: 0;
-      font-family: Tahoma, Arial, sans-serif;
-      background: #f8f8f8;
-      color: #222;
-    }
-
-    header {
-      background: white;
-      text-align: center;
-      padding: 25px 15px;
-      border-bottom: 3px solid #c8102e;
-    }
-
-    .logo {
-      color: #c8102e;
-      font-size: 32px;
-      font-weight: bold;
-    }
-
-    header p {
-      color: #777;
-      margin-bottom: 0;
-    }
-
-    .hero {
-      background: #c8102e;
-      color: white;
-      padding: 30px 20px;
-      text-align: center;
-    }
-
-    .hero h1 {
-      margin: 0 0 10px;
-      font-size: 27px;
-    }
-
-    .hero p {
-      margin: 0;
-    }
-
-    .categories {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      padding: 18px 12px;
-      background: white;
-    }
-
-    .categories button {
-      border: 1px solid #c8102e;
-      background: white;
-      color: #c8102e;
-      padding: 10px 18px;
-      border-radius: 25px;
-      white-space: nowrap;
-      font-size: 15px;
-      cursor: pointer;
-    }
-
-    .categories button.active {
-      background: #c8102e;
-      color: white;
-    }
-
-    main {
-      padding: 20px 15px 100px;
-      max-width: 900px;
-      margin: auto;
-    }
-
-    .section-title {
-      color: #c8102e;
-      font-size: 22px;
-      margin-bottom: 18px;
-    }
-
-    .empty {
-      text-align: center;
-      background: white;
-      border-radius: 15px;
-      padding: 35px 15px;
-      color: #777;
-    }
-
-    .cart-bar {
-      position: fixed;
-      bottom: 0;
-      right: 0;
-      left: 0;
-      background: #c8102e;
-      color: white;
-      padding: 16px;
-      text-align: center;
-      font-size: 17px;
-      font-weight: bold;
-    }
-
-    footer {
-      text-align: center;
-      padding: 20px;
-      color: #888;
-      font-size: 13px;
-    }
-  </style>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f7f7f7;font-family:Tahoma,Arial;color:#222}
+header{text-align:center;background:white;padding:20px;border-bottom:4px solid #c8102e}
+.logo{font-size:30px;font-weight:bold;color:#c8102e}
+header p{color:#777;margin-bottom:0}
+.hero{background:#c8102e;color:white;text-align:center;padding:28px 12px}
+.hero h1{margin:0 0 10px}
+.categories{display:flex;overflow-x:auto;gap:8px;padding:14px;background:white;position:sticky;top:0;z-index:5}
+.categories button{white-space:nowrap;border:1px solid #c8102e;background:white;color:#c8102e;border-radius:22px;padding:10px 15px}
+.categories button.active{background:#c8102e;color:white}
+main{max-width:950px;margin:auto;padding:18px 12px 110px}
+h2{color:#c8102e;font-size:22px}
+.products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.card{background:white;border-radius:14px;padding:13px;box-shadow:0 2px 8px #0001}
+.food-icon{background:#fff0f0;border-radius:12px;text-align:center;font-size:42px;padding:17px}
+.card h3{font-size:15px;margin:12px 0 8px}
+.price{color:#c8102e;font-weight:bold;margin:8px 0}
+.card button,.send,.close{border:0;border-radius:9px;background:#c8102e;color:white;padding:11px;width:100%;font-size:14px;cursor:pointer}
+.cart-bar{position:fixed;bottom:0;right:0;left:0;background:#c8102e;color:white;padding:15px;text-align:center;font-weight:bold;z-index:10;cursor:pointer}
+#cart{display:none;position:fixed;inset:0;background:#0009;z-index:20;padding:12px;overflow:auto}
+.cart-box{background:white;border-radius:15px;padding:18px;max-width:500px;margin:25px auto}
+.cart-item{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #eee;padding:10px 0}
+.cart-item button{border:0;background:#eee;padding:5px 10px;border-radius:6px}
+input,textarea{width:100%;padding:12px;margin:7px 0;border:1px solid #ddd;border-radius:8px;font-family:inherit}
+.total{font-size:19px;color:#c8102e;font-weight:bold;margin:15px 0}
+footer{text-align:center;padding:20px;color:#888}
+@media(min-width:650px){.products{grid-template-columns:repeat(3,minmax(0,1fr))}}
+</style>
 </head>
 
 <body>
 
-  <header>
-    <div class="logo">Fresh Chicken</div>
-    <p>الطعم الذي تحبه ❤️</p>
-  </header>
+<header>
+<div class="logo">🐔 Fresh Chicken</div>
+<p>أشهى الوجبات وأطيب النكهات</p>
+</header>
 
-  <section class="hero">
-    <h1>أهلاً بكم في Fresh Chicken</h1>
-    <p>اكتشفوا أشهى وجبات الدجاج والوجبات المميزة</p>
-  </section>
+<section class="hero">
+<h1>مرحباً بكم في Fresh Chicken</h1>
+<p>اختر وجبتك واستمتع بطلبك</p>
+</section>
 
-  <nav class="categories">
-    <button class="active">الكل</button>
-    <button>كنتاكي</button>
-    <button>بيتزا</button>
-    <button>شاورما</button>
-    <button>برغر</button>
-    <button>ساندويش</button>
-    <button>فرايز</button>
-    <button>ريزو</button>
-    <button>مقبلات</button>
-  </nav>
+<nav class="categories" id="categories"></nav>
 
-  <main>
-    <h2 class="section-title">قائمة الطعام 🍗</h2>
+<main>
+<h2 id="sectionTitle">جميع الوجبات 🍗</h2>
+<div class="products" id="products"></div>
+</main>
 
-    <div class="empty">
-      <h3>قريباً نعرض لكم أشهى وجباتنا</h3>
-      <p>نعمل الآن على تجهيز قائمة الطعام والأسعار.</p>
-    </div>
-  </main>
+<div class="cart-bar" onclick="openCart()">
+🛒 سلة الطلبات (<span id="count">0</span>)
+-
+<span id="barTotal">0</span> د.ع
+</div>
 
-  <div class="cart-bar">
-    🛒 سلة الطلبات — 0 د.ع
-  </div>
+<div id="cart">
+<div class="cart-box">
+<h2>🛒 سلة مشترياتك</h2>
+<div id="cartItems"></div>
+<div class="total">الإجمالي: <span id="total">0</span> د.ع</div>
 
-  <footer>
-    جميع الحقوق محفوظة © Fresh Chicken
-  </footer>
+<h3>بيانات الزبون</h3>
+<input id="customerName" placeholder="الاسم الكامل">
+<input id="customerPhone" type="tel" placeholder="رقم الهاتف">
+<textarea id="customerAddress" placeholder="العنوان والمنطقة" rows="3"></textarea>
+<textarea id="notes" placeholder="ملاحظات إضافية (اختياري)" rows="2"></textarea>
+
+<button class="send" onclick="sendOrder()">إرسال الطلب عبر واتساب</button>
+<button class="close" style="background:#555;margin-top:10px" onclick="closeCart()">إغلاق</button>
+</div>
+</div>
+
+<footer>
+Fresh Chicken © جميع الحقوق محفوظة
+<br><br>
+للطلب والاستفسار: 07773398555
+</footer>
+
+<script>
+const whatsapp = "9647773398555";
+
+const categories = [
+"الكل","كنتاكي","بيتزا","شاورما","برغر",
+"ساندويش","فرايز","ريزو","فنكر","ستربس",
+"مقبلات","صاج إيطالي"
+];
+
+const products = [
+["كنتاكي","وجبة كنتاكي قطعتين",5000],
+["كنتاكي","وجبة كنتاكي 3 قطع",7000],
+["كنتاكي","وجبة كنتاكي 5 قطع",12000],
+["كنتاكي","وجبة كنتاكي 8 قطع",18000],
+["كنتاكي","وجبة كنتاكي 10 قطع",20000],
+
+["برغر","بركر لحم",3500],
+["برغر","بركر دجاج بالجبن",3500],
+["برغر","بركر دجاج مدخن",3500],
+["برغر","بركر دجاج",3500],
+["برغر","بركر لحم بالجبن",4000],
+["برغر","بركر لحم مدخن",4000],
+["برغر","بركر لحم دبل",6000],
+["برغر","بركر دجاج دبل",6000],
+["برغر","سماش بركر",5000],
+
+["ساندويش","زنجر",3500],
+["ساندويش","زنجر سبايسي",3500],
+["ساندويش","زنجر مدخن",3500],
+["ساندويش","فلر",3500],
+["ساندويش","تويستر",4000],
+["ساندويش","تويستر مدخن",4500],
+["ساندويش","تويستر بالجبن",4500],
+["ساندويش","فاهيتا دجاج",4000],
+["ساندويش","فاهيتا لحم",5000],
+
+["فرايز","فرايز مدخن",5000],
+["فرايز","فرايز كلاسيك",5000],
+["فرايز","فرايز هالينو",5000],
+["فرايز","فرايز ماكس",5000],
+["فرايز","فرايز دوريتوس",5000],
+["فرايز","فرايز باجبن",5000],
+
+["ريزو","ريزو شاورما دجاج",5000],
+["ريزو","ريزو بالجبن",5000],
+["ريزو","ريزو أعشاب",5000],
+["ريزو","ريزو كلاسيك",5000],
+["ريزو","ريزو سبايسي",5000],
+["ريزو","ريزو شاورما لحم",6000],
+["ريزو","ريزو مدخن",5000],
+
+["فنكر","كلاس فنكر",1500],
+["فنكر","فنكر كلاسيك",2000],
+["فنكر","فنكر بالجبن",2500],
+
+["ستربس","ستربس 3 قطع",5000],
+["ستربس","ستربس 6 قطع",10000],
+["ستربس","ستربس 8 قطع",15000],
+["ستربس","ستربس 12 قطعة",18000],
+
+["مقبلات","مقبلات صغير",1500],
+["مقبلات","مقبلات وسط",3000],
+["مقبلات","مقبلات كبير",4000],
+
+["شاورما","ساندويش شاورما دجاج",2500],
+["شاورما","ساندويش شاورما لحم",3000],
+["شاورما","صاج دجاج",2500],
+["شاورما","صاج لحم",3000],
+["شاورما","ربع نفر شاورما دجاج",6000],
+["شاورما","نص نفر شاورما دجاج",12000],
+["شاورما","نفر شاورما دجاج",24000],
+["شاورما","ربع نفر شاورما لحم",8000],
+["شاورما","نص نفر شاورما لحم",17000],
+["شاورما","نفر شاورما لحم",35000],
+
+["صاج إيطالي","صاج إيطالي دجاج",5000],
+["صاج إيطالي","صاج إيطالي لحم",5500],
+["صاج إيطالي","لفم دجاج",5000],
+["صاج إيطالي","لفم لحم",6000],
+
+["بيتزا","بيتزا لحم - صغير",7000],
+["بيتزا","بيتزا لحم - وسط",11000],
+["بيتزا","بيتزا لحم - كبير",13000],
+["بيتزا","بيتزا دجاج - صغير",6000],
+["بيتزا","بيتزا دجاج - وسط",9000],
+["بيتزا","بيتزا دجاج - كبير",12000],
+["بيتزا","بيتزا خضروات - صغير",5000],
+["بيتزا","بيتزا خضروات - وسط",7000],
+["بيتزا","بيتزا خضروات - كبير",10000],
+["بيتزا","بيتزا مشكل - صغير",7000],
+["بيتزا","بيتزا مشكل - وسط",11000],
+["بيتزا","بيتزا مشكل - كبير",13000],
+["بيتزا","بيتزا مارغريتا - صغير",5000],
+["بيتزا","بيتزا مارغريتا - وسط",7000],
+["بيتزا","بيتزا مارغريتا - كبير",10000],
+["بيتزا","بيتزا فريش تشكن - صغير",7000],
+["بيتزا","بيتزا فريش تشكن - وسط",10000],
+["بيتزا","بيتزا فريش تشكن - كبير",13000],
+["بيتزا","بيتزا بيبروني - صغير",5000],
+["بيتزا","بيتزا بيبروني - وسط",7000],
+["بيتزا","بيتزا بيبروني - كبير",10000]
+];
+
+const icons = {
+"كنتاكي":"🍗","بيتزا":"🍕","شاورما":"🌯",
+"برغر":"🍔","ساندويش":"🥪","فرايز":"🍟",
+"ريزو":"🍚","فنكر":"🍟","ستربس":"🍗",
+"مقبلات":"🥗","صاج إيطالي":"🥙"
+};
+
+let selected = "الكل";
+let cart = [];
+
+function renderCategories(){
+ const nav = document.getElementById("categories");
+ nav.innerHTML = categories.map(c =>
+ `<button class="${c===selected?'active':''}" onclick="filter('${c}')">${c}</button>`
+ ).join("");
+}
+
+function renderProducts(){
+ const list = document.getElementById("products");
+ const items = products.map((p,i)=>({...{category:p[0],name:p[1],price:p[2]},id:i}))
+ .filter(p=>selected==="الكل" || p.category===selected);
+
+ document.getElementById("sectionTitle").textContent =
+ selected==="الكل" ? "جميع الوجبات 🍗" : selected;
+
+ list.innerHTML = items.map(p=>`
+ <div class="card">
+ <div class="food-icon">${icons[p.category] || "🍽️"}</div>
+ <h3>${p.name}</h3>
+ <div class="price">${p.price.toLocaleString("en-US")} د.ع</div>
+ <button onclick="addToCart(${p.id})">أضف إلى السلة +</button>
+ </div>
+ `).join("");
+}
+
+function filter(category){
+ selected=category;
+ renderCategories();
+ renderProducts();
+}
+
+function addToCart(id){
+ const p=products[id];
+ const item=cart.find(x=>x.id===id);
+ if(item)item.qty++;
+ else cart.push({id,name:p[1],price:p[2],qty:1});
+ updateCart();
+}
+
+function updateCart(){
+ const count=cart.reduce((s,x)=>s+x.qty,0);
+ const total=cart.reduce((s,x)=>s+x.price*x.qty,0);
+
+ document.getElementById("count").textContent=count;
+ document.getElementById("barTotal").textContent=total.toLocaleString("en-US");
+ document.getElementById("total").textContent=total.toLocaleString("en-US");
+
+ document.getElementById("cartItems").innerHTML=cart.map(x=>`
+ <div class="cart-item">
+ <div>${x.name}<br>${x.price.toLocaleString("en-US")} × ${x.qty}</div>
+ <div>
+ <button onclick="changeQty(${x.id},-1)">−</button>
+ ${x.qty}
+ <button onclick="changeQty(${x.id},1)">+</button>
+ </div>
+ </div>
+ `).join("");
+}
+
+function changeQty(id,change){
+ const item=cart.find(x=>x.id===id);
+ if(!item)return;
+ item.qty+=change;
+ if(item.qty<=0)cart=cart.filter(x=>x.id!==id);
+ updateCart();
+}
+
+function openCart(){
+ document.getElementById("cart").style.display="block";
+ updateCart();
+}
+function closeCart(){
+ document.getElementById("cart").style.display="none";
+}
+
+function sendOrder(){
+ if(!cart.length){
+ alert("السلة فارغة");
+ return;
+ }
+
+ const name=document.getElementById("customerName").value.trim();
+ const phone=document.getElementById("customerPhone").value.trim();
+ const address=document.getElementById("customerAddress").value.trim();
+ const notes=document.getElementById("notes").value.trim();
+
+ if(!name || !phone || !address){
+ alert("يرجى إدخال الاسم ورقم الهاتف والعنوان");
+ return;
+ }
+
+ const total=cart.reduce((s,x)=>s+x.price*x.qty,0);
+
+ let message="🍗 طلب جديد - Fresh Chicken\n\n";
+ message+="الاسم: "+name+"\n";
+ message+="الهاتف: "+phone+"\n";
+ message+="العنوان: "+address+"\n\n";
+ message+="تفاصيل الطلب:\n";
+
+ cart.forEach(x=>{
+ message+=x.name+" × "+x.qty+" = "+
+ (x.price*x.qty).toLocaleString("en-US")+" د.ع\n";
+ });
+
+ message+="\nالإجمالي: "+total.toLocaleString("en-US")+" د.ع\n";
+ if(notes)message+="ملاحظات: "+notes+"\n";
+ message+="\nشكراً لاختياركم Fresh Chicken ❤️";
+
+ window.open("https://wa.me/"+whatsapp+"?text="+encodeURIComponent(message),"_blank");
+}
+
+renderCategories();
+renderProducts();
+updateCart();
+</script>
 
 </body>
 </html>
