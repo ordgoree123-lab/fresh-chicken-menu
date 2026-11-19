@@ -39,6 +39,7 @@ footer{text-align:center;padding:20px;color:#888}
 #successPanel p{line-height:1.8;margin:0 0 12px;color:#175b2a}
 #successPanel .wa-link{background:#168b45}
 #successPanel .secondary{margin-top:8px;background:#555}
+#loadMessage{text-align:center;color:#777;padding:18px;line-height:1.8}
 @media(min-width:650px){.products{grid-template-columns:repeat(3,minmax(0,1fr))}.food-photo{height:175px}}
 @media(max-width:360px){.food-photo{height:120px}.card-content{padding:10px}}
 </style>
@@ -55,6 +56,7 @@ footer{text-align:center;padding:20px;color:#888}
 <nav class="categories" id="categories"></nav>
 <main>
 <h2 id="sectionTitle">جميع الوجبات 🍗</h2>
+<div id="loadMessage">جارٍ تحميل المنيو...</div>
 <div class="products" id="products"></div>
 </main>
 <div class="cart-bar" onclick="openCart()">
@@ -85,7 +87,6 @@ footer{text-align:center;padding:20px;color:#888}
 Fresh Chicken © جميع الحقوق محفوظة<br><br>
 للطلب والاستفسار: 07706488633
 </footer>
-
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
@@ -102,278 +103,245 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const whatsapp = "9647706488633";
-
-const categories = [
-"الكل","كنتاكي","بيتزا","شاورما","برغر",
-"ساندويش","فرايز","ريزو","فنكر","ستربس",
-"مقبلات","صاج إيطالي"
-];
-
-const products = [
-["كنتاكي","وجبة كنتاكي قطعتين",5000],
-["كنتاكي","وجبة كنتاكي 3 قطع",7000],
-["كنتاكي","وجبة كنتاكي 5 قطع",12000],
-["كنتاكي","وجبة كنتاكي 8 قطع",18000],
-["كنتاكي","وجبة كنتاكي 10 قطع",20000],
-["برغر","بركر لحم",3500],
-["برغر","بركر دجاج بالجبن",3500],
-["برغر","بركر دجاج مدخن",3500],
-["برغر","بركر دجاج",3500],
-["برغر","بركر لحم بالجبن",4000],
-["برغر","بركر لحم مدخن",4000],
-["برغر","بركر لحم دبل",6000],
-["برغر","بركر دجاج دبل",6000],
-["برغر","سماش بركر",5000],
-["ساندويش","زنجر",3500],
-["ساندويش","زنجر سبايسي",3500],
-["ساندويش","زنجر مدخن",3500],
-["ساندويش","فلر",3500],
-["ساندويش","تويستر",4000],
-["ساندويش","تويستر مدخن",4500],
-["ساندويش","تويستر بالجبن",4500],
-["ساندويش","فاهيتا دجاج",4000],
-["ساندويش","فاهيتا لحم",5000],
-["فرايز","فرايز مدخن",5000],
-["فرايز","فرايز كلاسيك",5000],
-["فرايز","فرايز هالينو",5000],
-["فرايز","فرايز ماكس",5000],
-["فرايز","فرايز دوريتوس",5000],
-["فرايز","فرايز باجبن",5000],
-["ريزو","ريزو شاورما دجاج",5000],
-["ريزو","ريزو بالجبن",5000],
-["ريزو","ريزو أعشاب",5000],
-["ريزو","ريزو كلاسيك",5000],
-["ريزو","ريزو سبايسي",5000],
-["ريزو","ريزو شاورما لحم",6000],
-["ريزو","ريزو مدخن",5000],
-["فنكر","كلاس فنكر",1500],
-["فنكر","فنكر كلاسيك",2000],
-["فنكر","فنكر بالجبن",2500],
-["ستربس","ستربس 3 قطع",5000],
-["ستربس","ستربس 6 قطع",10000],
-["ستربس","ستربس 8 قطع",15000],
-["ستربس","ستربس 12 قطعة",18000],
-["مقبلات","مقبلات صغير",1500],
-["مقبلات","مقبلات وسط",3000],
-["مقبلات","مقبلات كبير",4000],
-["شاورما","ساندويش شاورما دجاج",2500],
-["شاورما","ساندويش شاورما لحم",3000],
-["شاورما","صاج دجاج",2500],
-["شاورما","صاج لحم",3000],
-["شاورما","ربع نفر شاورما دجاج",6000],
-["شاورما","نص نفر شاورما دجاج",12000],
-["شاورما","نفر شاورما دجاج",24000],
-["شاورما","ربع نفر شاورما لحم",8000],
-["شاورما","نص نفر شاورما لحم",17000],
-["شاورما","نفر شاورما لحم",35000],
-["صاج إيطالي","صاج إيطالي دجاج",5000],
-["صاج إيطالي","صاج إيطالي لحم",5500],
-["صاج إيطالي","لفم دجاج",5000],
-["صاج إيطالي","لفم لحم",6000],
-["بيتزا","بيتزا لحم - صغير",7000],
-["بيتزا","بيتزا لحم - وسط",11000],
-["بيتزا","بيتزا لحم - كبير",13000],
-["بيتزا","بيتزا دجاج - صغير",6000],
-["بيتزا","بيتزا دجاج - وسط",9000],
-["بيتزا","بيتزا دجاج - كبير",12000],
-["بيتزا","بيتزا خضروات - صغير",5000],
-["بيتزا","بيتزا خضروات - وسط",7000],
-["بيتزا","بيتزا خضروات - كبير",10000],
-["بيتزا","بيتزا مشكل - صغير",7000],
-["بيتزا","بيتزا مشكل - وسط",11000],
-["بيتزا","بيتزا مشكل - كبير",13000],
-["بيتزا","بيتزا مارغريتا - صغير",5000],
-["بيتزا","بيتزا مارغريتا - وسط",7000],
-["بيتزا","بيتزا مارغريتا - كبير",10000],
-["بيتزا","بيتزا فريش تشكن - صغير",7000],
-["بيتزا","بيتزا فريش تشكن - وسط",10000],
-["بيتزا","بيتزا فريش تشكن - كبير",13000],
-["بيتزا","بيتزا بيبروني - صغير",5000],
-["بيتزا","بيتزا بيبروني - وسط",7000],
-["بيتزا","بيتزا بيبروني - كبير",10000]
-];
-
-// صورة موحدة مناسبة لكل فئة. يمكن استبدالها لاحقاً بصور المطعم الأصلية.
-const categoryImages = {
-"كنتاكي":"https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=900&q=80",
-"بيتزا":"https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=900&q=80",
-"شاورما":"https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=900&q=80",
-"برغر":"https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=900&q=80",
-"ساندويش":"https://images.unsplash.com/photo-1553909489-cd47e0ef937f?auto=format&fit=crop&w=900&q=80",
-"فرايز":"https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=900&q=80",
-"ريزو":"https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=900&q=80",
-"فنكر":"https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=900&q=80",
-"ستربس":"https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=900&q=80",
-"مقبلات":"https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
-"صاج إيطالي":"https://images.unsplash.com/photo-1553909489-cd47e0ef937f?auto=format&fit=crop&w=900&q=80"
-};
 const fallbackImage = "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80";
 
+let products = [];
+let categories = ["الكل"];
 let selected = "الكل";
 let cart = [];
 let sendingOrder = false;
+let productsUnsubscribe = null;
+
+function escapeHTML(value){
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  })[char]);
+}
+
+function startProductsListener(){
+  const loadMessage = document.getElementById("loadMessage");
+  loadMessage.textContent = "جارٍ تحميل المنيو...";
+  productsUnsubscribe = db.collection("products").onSnapshot(snapshot => {
+    products = snapshot.docs
+      .filter(doc => {
+        const data = doc.data();
+        return data.isMigrationMarker !== true && data.available !== false &&
+          typeof data.name === "string" &&
+          typeof data.category === "string" &&
+          Number.isSafeInteger(data.price) && data.price > 0;
+      })
+      .map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          name: data.name,
+          category: data.category,
+          price: data.price,
+          imageUrl: typeof data.imageUrl === "string" ? data.imageUrl : "",
+          description: typeof data.description === "string" ? data.description : "",
+          sortOrder: Number.isFinite(data.sortOrder) ? data.sortOrder : 999999
+        };
+      })
+      .sort((a,b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name, "ar"));
+
+    const availableCategories = [...new Set(products.map(p => p.category))];
+    const previousSelection = selected;
+    categories = ["الكل", ...availableCategories];
+    selected = categories.includes(previousSelection) ? previousSelection : "الكل";
+
+    loadMessage.style.display = products.length ? "none" : "block";
+    loadMessage.textContent = products.length ? "" : "لا توجد منتجات متاحة حالياً. يرجى المحاولة لاحقاً.";
+    renderCategories();
+    renderProducts();
+  }, error => {
+    console.error("Products loading error:", error);
+    loadMessage.style.display = "block";
+    loadMessage.textContent = "تعذر تحميل المنيو حالياً. يرجى تحديث الصفحة أو المحاولة لاحقاً.";
+  });
+}
 
 function renderCategories(){
- const nav = document.getElementById("categories");
- nav.innerHTML = categories.map(c =>
- `<button class="${c===selected?'active':''}" onclick="filter('${c}')">${c}</button>`
- ).join("");
+  const nav = document.getElementById("categories");
+  nav.innerHTML = categories.map(c =>
+    `<button type="button" class="${c===selected?'active':''}" data-category="${escapeHTML(c)}">${escapeHTML(c)}</button>`
+  ).join("");
+  nav.querySelectorAll("button").forEach(button => {
+    button.addEventListener("click", () => filter(button.dataset.category));
+  });
 }
 
 function renderProducts(){
- const list = document.getElementById("products");
- const items = products.map((p,i)=>({
-   category:p[0], name:p[1], price:p[2], id:i
- })).filter(p=>selected==="الكل" || p.category===selected);
+  const list = document.getElementById("products");
+  const items = products.filter(p => selected === "الكل" || p.category === selected);
+  document.getElementById("sectionTitle").textContent =
+    selected === "الكل" ? "جميع الوجبات 🍗" : selected;
 
- document.getElementById("sectionTitle").textContent =
- selected==="الكل" ? "جميع الوجبات 🍗" : selected;
+  if(!items.length){
+    list.innerHTML = "";
+    return;
+  }
 
- list.innerHTML = items.map(p=>`
- <div class="card">
- <img class="food-photo"
-      src="${categoryImages[p.category] || fallbackImage}"
-      alt="${p.name}"
-      loading="lazy"
-      onerror="this.onerror=null;this.src='${fallbackImage}'">
- <div class="card-content">
- <h3>${p.name}</h3>
- <div class="price">${p.price.toLocaleString("en-US")} د.ع</div>
- <button onclick="addToCart(${p.id})">أضف إلى السلة +</button>
- </div>
- </div>
- `).join("");
+  list.innerHTML = items.map(p => {
+    const image = /^https?:\/\/\S+$/i.test(p.imageUrl) ? p.imageUrl : fallbackImage;
+    return `
+      <div class="card">
+        <img class="food-photo" src="${escapeHTML(image)}" alt="${escapeHTML(p.name)}"
+             loading="lazy" onerror="this.onerror=null;this.src='${fallbackImage}'">
+        <div class="card-content">
+          <h3>${escapeHTML(p.name)}</h3>
+          ${p.description ? `<div>${escapeHTML(p.description)}</div>` : ""}
+          <div class="price">${p.price.toLocaleString("en-US")} د.ع</div>
+          <button type="button" data-add-id="${escapeHTML(p.id)}">أضف إلى السلة +</button>
+        </div>
+      </div>`;
+  }).join("");
+
+  list.querySelectorAll("[data-add-id]").forEach(button => {
+    button.addEventListener("click", () => addToCart(button.dataset.addId));
+  });
 }
 
 function filter(category){
- selected=category;
- renderCategories();
- renderProducts();
+  selected = category;
+  renderCategories();
+  renderProducts();
 }
 
 function addToCart(id){
- const p=products[id];
- const item=cart.find(x=>x.id===id);
- if(item)item.qty++;
- else cart.push({id,name:p[1],price:p[2],qty:1});
- updateCart();
+  const p = products.find(product => product.id === id);
+  if(!p){alert("هذا المنتج لم يعد متاحاً. حدّث الصفحة من فضلك.");return;}
+  const item = cart.find(x => x.id === id);
+  if(item){item.qty++; item.name=p.name; item.price=p.price;}
+  else cart.push({id:p.id,name:p.name,price:p.price,qty:1});
+  updateCart();
 }
 
 function updateCart(){
- const count=cart.reduce((s,x)=>s+x.qty,0);
- const total=cart.reduce((s,x)=>s+x.price*x.qty,0);
- document.getElementById("count").textContent=count;
- document.getElementById("barTotal").textContent=total.toLocaleString("en-US");
- document.getElementById("total").textContent=total.toLocaleString("en-US");
- document.getElementById("cartItems").innerHTML=cart.map(x=>`
- <div class="cart-item">
- <div>${x.name}<br>${x.price.toLocaleString("en-US")} × ${x.qty}</div>
- <div>
- <button onclick="changeQty(${x.id},-1)">−</button>
- ${x.qty}
- <button onclick="changeQty(${x.id},1)">+</button>
- </div>
- </div>
- `).join("");
+  const count = cart.reduce((s,x)=>s+x.qty,0);
+  const total = cart.reduce((s,x)=>s+x.price*x.qty,0);
+  document.getElementById("count").textContent = count;
+  document.getElementById("barTotal").textContent = total.toLocaleString("en-US");
+  document.getElementById("total").textContent = total.toLocaleString("en-US");
+
+  document.getElementById("cartItems").innerHTML = cart.map(x=>`
+    <div class="cart-item">
+      <div>${escapeHTML(x.name)}<br>${x.price.toLocaleString("en-US")} × ${x.qty}</div>
+      <div>
+        <button type="button" data-change-id="${escapeHTML(x.id)}" data-change="-1">−</button>
+        ${x.qty}
+        <button type="button" data-change-id="${escapeHTML(x.id)}" data-change="1">+</button>
+      </div>
+    </div>
+  `).join("");
+
+  document.querySelectorAll("[data-change-id]").forEach(button => {
+    button.addEventListener("click", () =>
+      changeQty(button.dataset.changeId, Number(button.dataset.change))
+    );
+  });
 }
 
 function changeQty(id,change){
- const item=cart.find(x=>x.id===id);
- if(!item)return;
- item.qty+=change;
- if(item.qty<=0)cart=cart.filter(x=>x.id!==id);
- updateCart();
+  const item=cart.find(x=>x.id===id);
+  if(!item)return;
+  item.qty+=change;
+  if(item.qty<=0)cart=cart.filter(x=>x.id!==id);
+  updateCart();
 }
 
 function openCart(){
- document.getElementById("cart").style.display="block";
- updateCart();
+  document.getElementById("cart").style.display="block";
+  updateCart();
 }
 function closeCart(){document.getElementById("cart").style.display="none";}
 
 async function saveOrder(name,phone,address,notes){
- const total=cart.reduce((s,x)=>s+x.price*x.qty,0);
- const orderItems=cart.map(x=>({
-   productId:x.id,name:x.name,price:x.price,
-   quantity:x.qty,subtotal:x.price*x.qty
- }));
- const orderData={
-   customerName:name,customerPhone:phone,customerAddress:address,
-   notes:notes,items:orderItems,total:total,status:"new",
-   createdAt:firebase.firestore.FieldValue.serverTimestamp()
- };
- const docRef=await db.collection("orders").add(orderData);
- return {orderId:docRef.id,total:total};
+  const total=cart.reduce((s,x)=>s+x.price*x.qty,0);
+  const orderItems=cart.map(x=>({
+    productId:x.id,
+    name:x.name,
+    price:x.price,
+    quantity:x.qty,
+    subtotal:x.price*x.qty
+  }));
+  const orderData={
+    customerName:name,
+    customerPhone:phone,
+    customerAddress:address,
+    notes:notes,
+    items:orderItems,
+    total:total,
+    status:"new",
+    createdAt:firebase.firestore.FieldValue.serverTimestamp()
+  };
+  const docRef=await db.collection("orders").add(orderData);
+  return {orderId:docRef.id,total:total};
 }
 
 async function sendOrder(){
- if(sendingOrder)return;
- if(!cart.length){alert("السلة فارغة");return;}
+  if(sendingOrder)return;
+  if(!cart.length){alert("السلة فارغة");return;}
 
- const name=document.getElementById("customerName").value.trim();
- const phone=document.getElementById("customerPhone").value.trim();
- const address=document.getElementById("customerAddress").value.trim();
- const notes=document.getElementById("notes").value.trim();
+  const name=document.getElementById("customerName").value.trim();
+  const phone=document.getElementById("customerPhone").value.trim();
+  const address=document.getElementById("customerAddress").value.trim();
+  const notes=document.getElementById("notes").value.trim();
 
- if(!name || !phone || !address){
-   alert("يرجى إدخال الاسم ورقم الهاتف والعنوان");return;
- }
- if(phone.length<7){alert("يرجى التأكد من رقم الهاتف");return;}
+  if(!name||!phone||!address){alert("يرجى إدخال الاسم ورقم الهاتف والعنوان");return;}
+  if(phone.length<7){alert("يرجى التأكد من رقم الهاتف");return;}
 
- const sendButton=document.getElementById("sendButton");
- sendingOrder=true;
- sendButton.disabled=true;
- sendButton.textContent="جارٍ حفظ الطلب...";
+  const sendButton=document.getElementById("sendButton");
+  sendingOrder=true;
+  sendButton.disabled=true;
+  sendButton.textContent="جارٍ حفظ الطلب...";
 
- try{
-   const result=await saveOrder(name,phone,address,notes);
-   let message="🍗 طلب جديد - Fresh Chicken\n\n";
-   message+="رقم الطلب: "+result.orderId+"\n";
-   message+="الاسم: "+name+"\n";
-   message+="الهاتف: "+phone+"\n";
-   message+="العنوان: "+address+"\n\n";
-   message+="تفاصيل الطلب:\n";
-   cart.forEach(x=>{
-     message+=x.name+" × "+x.qty+" = "+
-       (x.price*x.qty).toLocaleString("en-US")+" د.ع\n";
-   });
-   message+="\nالإجمالي: "+result.total.toLocaleString("en-US")+" د.ع\n";
-   if(notes)message+="ملاحظات: "+notes+"\n";
-   message+="\nشكراً لاختياركم Fresh Chicken ❤️";
+  try{
+    const result=await saveOrder(name,phone,address,notes);
+    let message="🍗 طلب جديد - Fresh Chicken\n\n";
+    message+="رقم الطلب: "+result.orderId+"\n";
+    message+="الاسم: "+name+"\n";
+    message+="الهاتف: "+phone+"\n";
+    message+="العنوان: "+address+"\n\n";
+    message+="تفاصيل الطلب:\n";
+    cart.forEach(x=>{
+      message+=x.name+" × "+x.qty+" = "+
+        (x.price*x.qty).toLocaleString("en-US")+" د.ع\n";
+    });
+    message+="\nالإجمالي: "+result.total.toLocaleString("en-US")+" د.ع\n";
+    if(notes)message+="ملاحظات: "+notes+"\n";
+    message+="\nشكراً لاختياركم Fresh Chicken ❤️";
 
-   const waUrl="https://wa.me/"+whatsapp+"?text="+encodeURIComponent(message);
-   document.getElementById("whatsappLink").href=waUrl;
-   document.getElementById("successText").textContent=
-     "تم حفظ طلبك بنجاح في النظام. رقم الطلب: "+result.orderId+
-     ". اضغط «فتح واتساب وإرسال الطلب» لإرسال التفاصيل إلى المطعم.";
-   document.getElementById("successPanel").style.display="block";
-   document.getElementById("customerForm").style.display="none";
-
-   cart=[];
-   updateCart();
- }catch(error){
-   console.error("Firebase order error:",error);
-   alert("تعذر حفظ الطلب في قاعدة البيانات. لم يتم إنشاء رابط واتساب. يرجى المحاولة لاحقاً.");
- }finally{
-   sendingOrder=false;
-   sendButton.disabled=false;
-   sendButton.textContent="حفظ الطلب والمتابعة إلى واتساب";
- }
+    const waUrl="https://wa.me/"+whatsapp+"?text="+encodeURIComponent(message);
+    document.getElementById("whatsappLink").href=waUrl;
+    document.getElementById("successText").textContent=
+      "تم حفظ طلبك بنجاح في النظام. رقم الطلب: "+result.orderId+
+      ". اضغط «فتح واتساب وإرسال الطلب» لإرسال التفاصيل إلى المطعم.";
+    document.getElementById("successPanel").style.display="block";
+    document.getElementById("customerForm").style.display="none";
+    cart=[];
+    updateCart();
+  }catch(error){
+    console.error("Firebase order error:",error);
+    alert("تعذر حفظ الطلب في قاعدة البيانات. لم يتم إنشاء رابط واتساب. يرجى المحاولة لاحقاً.");
+  }finally{
+    sendingOrder=false;
+    sendButton.disabled=false;
+    sendButton.textContent="حفظ الطلب والمتابعة إلى واتساب";
+  }
 }
 
 function finishOrder(){
- document.getElementById("successPanel").style.display="none";
- document.getElementById("customerForm").style.display="block";
- document.getElementById("customerName").value="";
- document.getElementById("customerPhone").value="";
- document.getElementById("customerAddress").value="";
- document.getElementById("notes").value="";
- document.getElementById("whatsappLink").href="#";
- closeCart();
+  document.getElementById("successPanel").style.display="none";
+  document.getElementById("customerForm").style.display="block";
+  document.getElementById("customerName").value="";
+  document.getElementById("customerPhone").value="";
+  document.getElementById("customerAddress").value="";
+  document.getElementById("notes").value="";
+  document.getElementById("whatsappLink").href="#";
+  closeCart();
 }
 
-renderCategories();
-renderProducts();
+startProductsListener();
 updateCart();
 </script>
 </body>
