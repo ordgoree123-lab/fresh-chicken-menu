@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -25,6 +26,7 @@ h2{color:#c8102e;font-size:22px}
 .card h3{font-size:15px;margin:12px 0 8px}
 .price{color:#c8102e;font-weight:bold;margin:8px 0}
 .card button,.send,.close{border:0;border-radius:9px;background:#c8102e;color:white;padding:11px;width:100%;font-size:14px;cursor:pointer}
+button:disabled{opacity:.6;cursor:not-allowed}
 .cart-bar{position:fixed;bottom:0;right:0;left:0;background:#c8102e;color:white;padding:15px;text-align:center;font-weight:bold;z-index:10;cursor:pointer}
 #cart{display:none;position:fixed;inset:0;background:#0009;z-index:20;padding:12px;overflow:auto}
 .cart-box{background:white;border-radius:15px;padding:18px;max-width:500px;margin:25px auto}
@@ -74,7 +76,10 @@ footer{text-align:center;padding:20px;color:#888}
 <textarea id="customerAddress" placeholder="العنوان والمنطقة" rows="3"></textarea>
 <textarea id="notes" placeholder="ملاحظات إضافية (اختياري)" rows="2"></textarea>
 
-<button class="send" onclick="sendOrder()">إرسال الطلب عبر واتساب</button>
+<button class="send" id="sendButton" onclick="sendOrder()">
+إرسال الطلب عبر واتساب
+</button>
+
 <button class="close" style="background:#555;margin-top:10px" onclick="closeCart()">إغلاق</button>
 </div>
 </div>
@@ -85,14 +90,45 @@ Fresh Chicken © جميع الحقوق محفوظة
 للطلب والاستفسار: 07773398555
 </footer>
 
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
 <script>
+
+// ===================================
+// 1. إعدادات Firebase
+// ===================================
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAzvEG-JYV2DN30oZGmGM1Wt_HkGqnQqjY",
+  authDomain: "fresh-chicken-menu.firebaseapp.com",
+  projectId: "fresh-chicken-menu",
+  storageBucket: "fresh-chicken-menu.firebasestorage.app",
+  messagingSenderId: "353092642080",
+  appId: "1:353092642080:web:153c93521ed13ba2d12345",
+  measurementId: "G-V3BQ6YTRCN"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.firestore();
+
 const whatsapp = "9647773398555";
+
+// ===================================
+// 2. الأقسام
+// ===================================
 
 const categories = [
 "الكل","كنتاكي","بيتزا","شاورما","برغر",
 "ساندويش","فرايز","ريزو","فنكر","ستربس",
 "مقبلات","صاج إيطالي"
 ];
+
+// ===================================
+// 3. المنتجات والأسعار
+// ===================================
 
 const products = [
 ["كنتاكي","وجبة كنتاكي قطعتين",5000],
@@ -188,6 +224,10 @@ const products = [
 ["بيتزا","بيتزا بيبروني - كبير",10000]
 ];
 
+// ===================================
+// 4. أيقونات المنتجات
+// ===================================
+
 const icons = {
 "كنتاكي":"🍗","بيتزا":"🍕","شاورما":"🌯",
 "برغر":"🍔","ساندويش":"🥪","فرايز":"🍟",
@@ -197,18 +237,33 @@ const icons = {
 
 let selected = "الكل";
 let cart = [];
+let sendingOrder = false;
+
+// ===================================
+// 5. عرض الأقسام
+// ===================================
 
 function renderCategories(){
  const nav = document.getElementById("categories");
+
  nav.innerHTML = categories.map(c =>
  `<button class="${c===selected?'active':''}" onclick="filter('${c}')">${c}</button>`
  ).join("");
 }
 
+// ===================================
+// 6. عرض المنتجات
+// ===================================
+
 function renderProducts(){
  const list = document.getElementById("products");
- const items = products.map((p,i)=>({...{category:p[0],name:p[1],price:p[2]},id:i}))
- .filter(p=>selected==="الكل" || p.category===selected);
+
+ const items = products.map((p,i)=>({
+   category:p[0],
+   name:p[1],
+   price:p[2],
+   id:i
+ })).filter(p=>selected==="الكل" || p.category===selected);
 
  document.getElementById("sectionTitle").textContent =
  selected==="الكل" ? "جميع الوجبات 🍗" : selected;
@@ -229,11 +284,22 @@ function filter(category){
  renderProducts();
 }
 
+// ===================================
+// 7. سلة المشتريات
+// ===================================
+
 function addToCart(id){
  const p=products[id];
  const item=cart.find(x=>x.id===id);
+
  if(item)item.qty++;
- else cart.push({id,name:p[1],price:p[2],qty:1});
+ else cart.push({
+   id,
+   name:p[1],
+   price:p[2],
+   qty:1
+ });
+
  updateCart();
 }
 
@@ -260,8 +326,12 @@ function updateCart(){
 function changeQty(id,change){
  const item=cart.find(x=>x.id===id);
  if(!item)return;
+
  item.qty+=change;
- if(item.qty<=0)cart=cart.filter(x=>x.id!==id);
+
+ if(item.qty<=0)
+   cart=cart.filter(x=>x.id!==id);
+
  updateCart();
 }
 
@@ -269,14 +339,57 @@ function openCart(){
  document.getElementById("cart").style.display="block";
  updateCart();
 }
+
 function closeCart(){
  document.getElementById("cart").style.display="none";
 }
 
-function sendOrder(){
+// ===================================
+// 8. حفظ الطلب في Firebase
+// ===================================
+
+async function saveOrder(name,phone,address,notes){
+
+ const total=cart.reduce((s,x)=>s+x.price*x.qty,0);
+
+ const orderItems=cart.map(x=>({
+   productId:x.id,
+   name:x.name,
+   price:x.price,
+   quantity:x.qty,
+   subtotal:x.price*x.qty
+ }));
+
+ const orderData={
+   customerName:name,
+   customerPhone:phone,
+   customerAddress:address,
+   notes:notes,
+   items:orderItems,
+   total:total,
+   status:"new",
+   createdAt:firebase.firestore.FieldValue.serverTimestamp()
+ };
+
+ const docRef=await db.collection("orders").add(orderData);
+
+ return {
+   orderId:docRef.id,
+   total:total
+ };
+}
+
+// ===================================
+// 9. إرسال الطلب عبر واتساب
+// ===================================
+
+async function sendOrder(){
+
+ if(sendingOrder)return;
+
  if(!cart.length){
- alert("السلة فارغة");
- return;
+   alert("السلة فارغة");
+   return;
  }
 
  const name=document.getElementById("customerName").value.trim();
@@ -285,33 +398,99 @@ function sendOrder(){
  const notes=document.getElementById("notes").value.trim();
 
  if(!name || !phone || !address){
- alert("يرجى إدخال الاسم ورقم الهاتف والعنوان");
- return;
+   alert("يرجى إدخال الاسم ورقم الهاتف والعنوان");
+   return;
  }
 
- const total=cart.reduce((s,x)=>s+x.price*x.qty,0);
+ if(phone.length<7){
+   alert("يرجى التأكد من رقم الهاتف");
+   return;
+ }
 
- let message="🍗 طلب جديد - Fresh Chicken\n\n";
- message+="الاسم: "+name+"\n";
- message+="الهاتف: "+phone+"\n";
- message+="العنوان: "+address+"\n\n";
- message+="تفاصيل الطلب:\n";
+ const sendButton=document.getElementById("sendButton");
 
- cart.forEach(x=>{
- message+=x.name+" × "+x.qty+" = "+
- (x.price*x.qty).toLocaleString("en-US")+" د.ع\n";
- });
+ sendingOrder=true;
+ sendButton.disabled=true;
+ sendButton.textContent="جارٍ حفظ الطلب...";
 
- message+="\nالإجمالي: "+total.toLocaleString("en-US")+" د.ع\n";
- if(notes)message+="ملاحظات: "+notes+"\n";
- message+="\nشكراً لاختياركم Fresh Chicken ❤️";
+ // فتح نافذة واتساب مسبقاً لتجنب منع النوافذ المنبثقة
+ const waWindow=window.open("about:blank","_blank");
 
- window.open("https://wa.me/"+whatsapp+"?text="+encodeURIComponent(message),"_blank");
+ try{
+
+   // حفظ الطلب أولاً في قاعدة البيانات
+   const result=await saveOrder(name,phone,address,notes);
+
+   let message="🍗 طلب جديد - Fresh Chicken\n\n";
+   message+="رقم الطلب: "+result.orderId+"\n";
+   message+="الاسم: "+name+"\n";
+   message+="الهاتف: "+phone+"\n";
+   message+="العنوان: "+address+"\n\n";
+   message+="تفاصيل الطلب:\n";
+
+   cart.forEach(x=>{
+     message+=x.name+" × "+x.qty+" = "+
+     (x.price*x.qty).toLocaleString("en-US")+" د.ع\n";
+   });
+
+   message+="\nالإجمالي: "+result.total.toLocaleString("en-US")+" د.ع\n";
+
+   if(notes)message+="ملاحظات: "+notes+"\n";
+
+   message+="\nشكراً لاختياركم Fresh Chicken ❤️";
+
+   const waUrl="https://wa.me/"+whatsapp+
+   "?text="+encodeURIComponent(message);
+
+   alert("تم حفظ طلبك بنجاح! سيتم فتح واتساب الآن.");
+
+   if(waWindow){
+     waWindow.location.href=waUrl;
+   }else{
+     window.location.href=waUrl;
+   }
+
+   // تفريغ السلة بعد نجاح الحفظ
+   cart=[];
+   updateCart();
+
+   document.getElementById("customerName").value="";
+   document.getElementById("customerPhone").value="";
+   document.getElementById("customerAddress").value="";
+   document.getElementById("notes").value="";
+
+   closeCart();
+
+ }catch(error){
+
+   console.error("Firebase order error:",error);
+
+   if(waWindow)waWindow.close();
+
+   alert(
+     "تعذر حفظ الطلب في قاعدة البيانات.\n"+
+     "لم يتم إرسال الطلب عبر واتساب.\n"+
+     "يرجى المحاولة لاحقاً."
+   );
+
+ }finally{
+
+   sendingOrder=false;
+   sendButton.disabled=false;
+   sendButton.textContent="إرسال الطلب عبر واتساب";
+
+ }
+
 }
+
+// ===================================
+// 10. تشغيل الموقع
+// ===================================
 
 renderCategories();
 renderProducts();
 updateCart();
+
 </script>
 
 </body>
