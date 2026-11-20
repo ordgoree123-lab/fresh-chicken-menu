@@ -926,13 +926,22 @@ function printInvoice(id,order){
 }
 
 /* إضافة منتج */
+
+/* إضافة منتج */
 async function addProduct(){
   const name=document.getElementById("productName").value.trim();
   const category=document.getElementById("productCategory").value.trim();
   const price=Number(document.getElementById("productPrice").value);
   const saleText=document.getElementById("productSalePrice").value.trim();
   const salePrice=saleText?Number(saleText):null;
+
   const imageUrl=document.getElementById("productImage").value.trim();
+
+  if(imageUrl.startsWith("data:image/") && imageUrl.length>600000){
+    alert("حجم الصورة كبير. اختر صورة أخرى.");
+    return;
+  }
+
   const description=document.getElementById("productDescription").value.trim();
 
   let addons=[];
@@ -986,6 +995,7 @@ async function addProduct(){
     ].forEach(id=>document.getElementById(id).value="");
 
     document.getElementById("productImagePreview").src=fallbackImage;
+    document.getElementById("phoneImageInput").value="";
     document.getElementById("selectedImageLabel").textContent="لم يتم اختيار صورة بعد.";
 
     loadProducts();
@@ -994,6 +1004,7 @@ async function addProduct(){
     alert("تعذر إضافة المنتج: "+error.message);
   }
 }
+
 
 /* عرض المنتجات */
 async function loadProducts(){
@@ -1080,6 +1091,7 @@ async function loadProducts(){
 }
 
 /* تعديل المنتج مع معرض الصور */
+
 async function editProduct(id,product){
   const name=prompt("اسم المنتج:",product.name||"");
   if(name===null)return;
@@ -1125,9 +1137,25 @@ async function editProduct(id,product){
     return;
   }
 
-  /* فتح معرض الصور واختيار صورة جديدة أو الإبقاء على القديمة */
-  const selectedImage=await openImagePicker(category.trim(),product.imageUrl||categoryImages[category.trim()]||fallbackImage);
-  const finalImage=selectedImage||product.imageUrl||categoryImages[category.trim()]||fallbackImage;
+  let finalImage=
+    product.imageUrl||
+    categoryImages[category.trim()]||
+    fallbackImage;
+
+  const choosePhone=confirm(
+    "هل تريد اختيار صورة جديدة من معرض الهاتف؟\n\nموافق: اختيار من الهاتف\nإلغاء: اختيار من الصور الجاهزة"
+  );
+
+  if(choosePhone){
+    const phoneImage=await choosePhoneImageForEdit();
+    if(phoneImage) finalImage=phoneImage;
+  }else{
+    const selectedImage=await openImagePicker(
+      category.trim(),
+      finalImage
+    );
+    if(selectedImage) finalImage=selectedImage;
+  }
 
   try{
     const update={
@@ -1152,6 +1180,7 @@ async function editProduct(id,product){
     alert("تعذر تعديل المنتج: "+error.message);
   }
 }
+
 
 async function toggleProduct(id,currentStatus){
   try{
