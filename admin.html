@@ -23,7 +23,6 @@ button.blue{background:#1769aa}
 .order h3{margin-top:0;color:#c8102e;overflow-wrap:anywhere}
 .muted{color:#777;font-size:13px;line-height:1.7}
 .hidden{display:none!important}
-.status{font-weight:bold;color:#c8102e}
 .item{background:#f7f7f7;padding:9px;margin:6px 0;border-radius:6px;line-height:1.8}
 #message{color:#c8102e;overflow-wrap:anywhere;line-height:1.7}
 .product img{width:100%;max-width:180px;height:120px;object-fit:cover;border-radius:8px}
@@ -46,8 +45,6 @@ button.blue{background:#1769aa}
 .notification-actions button{flex:1;min-width:150px}
 #notificationStatus{margin:5px 0 0}
 hr{border:0;border-top:1px solid #eee;margin:17px 0}
-
-/* اختيار الصور */
 .image-picker-area{border:1px dashed #d5a0a8;background:#fffafa;border-radius:10px;padding:12px;margin:10px 0}
 .image-preview{width:100%;max-width:220px;height:145px;object-fit:cover;border-radius:10px;display:block;margin:10px auto;background:#eee}
 .image-picker-button{background:#1769aa}
@@ -76,7 +73,6 @@ hr{border:0;border-top:1px solid #eee;margin:17px 0}
 </header>
 
 <div class="container">
-
 <div class="box" id="loginBox">
 <h3>تسجيل دخول الإدارة</h3>
 <input id="email" type="email" placeholder="البريد الإلكتروني" autocomplete="username">
@@ -86,7 +82,6 @@ hr{border:0;border-top:1px solid #eee;margin:17px 0}
 </div>
 
 <div id="dashboard" class="hidden">
-
 <div class="box">
 <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
 <h3 style="margin:5px 0">ملخص المبيعات والطلبات 📊</h3>
@@ -132,71 +127,27 @@ hr{border:0;border-top:1px solid #eee;margin:17px 0}
 <div class="box">
 <h3>إدارة المنتجات 🍗</h3>
 <h4>إضافة منتج جديد</h4>
-
 <input id="productName" placeholder="اسم المنتج">
 <input id="productCategory" placeholder="القسم، مثال: كنتاكي أو برغر" list="categorySuggestions">
 <datalist id="categorySuggestions">
-<option value="كنتاكي">
-<option value="بيتزا">
-<option value="شاورما">
-<option value="برغر">
-<option value="ساندويش">
-<option value="فرايز">
-<option value="ريزو">
-<option value="فنكر">
-<option value="ستربس">
-<option value="مقبلات">
-<option value="صاج إيطالي">
+<option value="كنتاكي"><option value="بيتزا"><option value="شاورما">
+<option value="برغر"><option value="ساندويش"><option value="فرايز">
+<option value="ريزو"><option value="فنكر"><option value="ستربس">
+<option value="مقبلات"><option value="صاج إيطالي">
 </datalist>
-
 <input id="productPrice" type="number" min="1" placeholder="السعر الأساسي بالدينار">
 <input id="productSalePrice" type="number" min="1" placeholder="سعر العرض (اختياري)">
 
-
 <div class="image-picker-area">
-  <b>صورة المنتج</b>
-
-  <p class="muted">
-    اختر صورة من هاتفك أو استخدم الصور الجاهزة.
-  </p>
-
-  <img
-    id="productImagePreview"
-    class="image-preview"
-    alt="معاينة صورة المنتج"
-  >
-
-  <input id="productImage" type="hidden">
-
-  <input
-    id="phoneImageInput"
-    type="file"
-    accept="image/*"
-    hidden
-    onchange="handlePhoneImage(this)"
-  >
-
-  <button
-    type="button"
-    class="image-picker-button"
-    onclick="document.getElementById('phoneImageInput').click()"
-  >
-    اختيار صورة من الهاتف 📱
-  </button>
-
-  <button
-    type="button"
-    class="image-picker-button"
-    onclick="openAddImagePicker()"
-  >
-    اختيار صورة جاهزة 🖼️
-  </button>
-
-  <p id="selectedImageLabel" class="muted">
-    لم يتم اختيار صورة بعد.
-  </p>
+<b>صورة المنتج</b>
+<p class="muted">اختر صورة من هاتفك أو استخدم الصور الجاهزة.</p>
+<img id="productImagePreview" class="image-preview" alt="معاينة صورة المنتج">
+<input id="productImage" type="hidden">
+<input id="phoneImageInput" type="file" accept="image/*" hidden onchange="handlePhoneImage(this)">
+<button type="button" class="image-picker-button" onclick="document.getElementById('phoneImageInput').click()">اختيار صورة من الهاتف 📱</button>
+<button type="button" class="image-picker-button" onclick="openAddImagePicker()">اختيار صورة جاهزة 🖼️</button>
+<p id="selectedImageLabel" class="muted">لم يتم اختيار صورة بعد.</p>
 </div>
-
 
 <textarea id="productDescription" placeholder="وصف المنتج"></textarea>
 <textarea id="productAddons" placeholder="الإضافات الاختيارية، كل إضافة في سطر بهذا الشكل:
@@ -204,7 +155,6 @@ hr{border:0;border-top:1px solid #eee;margin:17px 0}
 صوص:500"></textarea>
 <p class="muted">يمكن ترك سعر العرض والإضافات فارغين. الحد الأقصى 10 إضافات لكل وجبة.</p>
 <button onclick="addProduct()">إضافة المنتج</button>
-
 <hr>
 <h4>المنتجات الحالية</h4>
 <button class="secondary" onclick="loadProducts()">تحديث المنتجات</button>
@@ -213,7 +163,6 @@ hr{border:0;border-top:1px solid #eee;margin:17px 0}
 </div>
 </div>
 
-<!-- نافذة معرض الصور -->
 <div id="imageModal" class="image-modal" role="dialog" aria-modal="true" aria-label="معرض الصور">
 <div class="image-modal-content">
 <div class="image-modal-header">
@@ -260,56 +209,57 @@ let knownOrderIds=new Set();
 let soundEnabled=false;
 let audioContext=null;
 
-/* الصور الجاهزة */
 const fallbackImage="https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80";
 
 const categoryImages={
-  "كنتاكي":"https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=900&q=80",
-  "بيتزا":"https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=900&q=80",
-  "شاورما":"https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=900&q=80",
-  "برغر":"https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=900&q=80",
-  "ساندويش":"https://images.unsplash.com/photo-1553909489-cd47e0ef937f?auto=format&fit=crop&w=900&q=80",
-  "فرايز":"https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=900&q=80",
-  "ريزو":"https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=900&q=80",
-  "فنكر":"https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=900&q=80",
-  "ستربس":"https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=900&q=80",
-  "مقبلات":"https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
-  "صاج إيطالي":"https://images.unsplash.com/photo-1553909489-cd47e0ef937f?auto=format&fit=crop&w=900&q=80"
+"كنتاكي":"https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=900&q=80",
+"بيتزا":"https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=900&q=80",
+"شاورما":"https://images.unsplash.com/photo-1529006557810-274b9b2fc783?auto=format&fit=crop&w=900&q=80",
+"برغر":"https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=900&q=80",
+"ساندويش":"https://images.unsplash.com/photo-1553909489-cd47e0ef937f?auto=format&fit=crop&w=900&q=80",
+"فرايز":"https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=900&q=80",
+"ريزو":"https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=900&q=80",
+"فنكر":"https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=900&q=80",
+"ستربس":"https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=900&q=80",
+"مقبلات":"https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
+"صاج إيطالي":"https://images.unsplash.com/photo-1553909489-cd47e0ef937f?auto=format&fit=crop&w=900&q=80"
 };
 
-/* مكتبة الصور التي تظهر داخل المعرض */
 const imageLibrary=[
-  {name:"دجاج مقرمش",category:"كنتاكي",url:categoryImages["كنتاكي"]},
-  {name:"بيتزا",category:"بيتزا",url:categoryImages["بيتزا"]},
-  {name:"شاورما",category:"شاورما",url:categoryImages["شاورما"]},
-  {name:"برغر",category:"برغر",url:categoryImages["برغر"]},
-  {name:"ساندويش",category:"ساندويش",url:categoryImages["ساندويش"]},
-  {name:"بطاطا فرايز",category:"فرايز",url:categoryImages["فرايز"]},
-  {name:"ريزو",category:"ريزو",url:categoryImages["ريزو"]},
-  {name:"فنكر",category:"فنكر",url:categoryImages["فنكر"]},
-  {name:"ستربس",category:"ستربس",url:categoryImages["ستربس"]},
-  {name:"مقبلات",category:"مقبلات",url:categoryImages["مقبلات"]},
-  {name:"صاج إيطالي",category:"صاج إيطالي",url:categoryImages["صاج إيطالي"]},
-  {name:"صورة طعام عامة",category:"عام",url:fallbackImage}
+{name:"دجاج مقرمش",category:"كنتاكي",url:categoryImages["كنتاكي"]},
+{name:"بيتزا",category:"بيتزا",url:categoryImages["بيتزا"]},
+{name:"شاورما",category:"شاورما",url:categoryImages["شاورما"]},
+{name:"برغر",category:"برغر",url:categoryImages["برغر"]},
+{name:"ساندويش",category:"ساندويش",url:categoryImages["ساندويش"]},
+{name:"بطاطا فرايز",category:"فرايز",url:categoryImages["فرايز"]},
+{name:"ريزو",category:"ريزو",url:categoryImages["ريزو"]},
+{name:"فنكر",category:"فنكر",url:categoryImages["فنكر"]},
+{name:"ستربس",category:"ستربس",url:categoryImages["ستربس"]},
+{name:"مقبلات",category:"مقبلات",url:categoryImages["مقبلات"]},
+{name:"صاج إيطالي",category:"صاج إيطالي",url:categoryImages["صاج إيطالي"]},
+{name:"صورة طعام عامة",category:"عام",url:fallbackImage}
 ];
 
 let pickerResolve=null;
 let pickerSelectedUrl="";
 
-/* نظام اختيار الصور */
 function openImagePicker(category,currentImage){
   return new Promise(resolve=>{
+    if(pickerResolve){
+      const oldResolve=pickerResolve;
+      pickerResolve=null;
+      oldResolve(null);
+    }
+
     pickerResolve=resolve;
     pickerSelectedUrl=currentImage||categoryImages[category]||fallbackImage;
-
     const grid=document.getElementById("imageGrid");
     grid.innerHTML="";
 
     const matching=imageLibrary.filter(x=>x.category===category);
     const others=imageLibrary.filter(x=>x.category!==category);
-    const choices=[...matching,...others];
 
-    choices.forEach(photo=>{
+    [...matching,...others].forEach(photo=>{
       const button=document.createElement("button");
       button.type="button";
       button.className="image-option"+(photo.url===pickerSelectedUrl?" selected":"");
@@ -329,7 +279,6 @@ function openImagePicker(category,currentImage){
         grid.querySelectorAll(".image-option").forEach(x=>x.classList.remove("selected"));
         button.classList.add("selected");
       };
-
       grid.appendChild(button);
     });
 
@@ -357,114 +306,126 @@ async function openAddImagePicker(){
   const category=document.getElementById("productCategory").value.trim();
   const current=document.getElementById("productImage").value;
   const chosen=await openImagePicker(category,current);
-  if(chosen){
-    setProductImage(chosen);
-  }
+  if(chosen)setProductImage(chosen);
 }
 
-function setProductImage(url){
-  
+/* ضغط الصورة قبل حفظها */
+function compressPhoneImage(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
 
-async function handlePhoneImage(input) {
-  const file = input.files && input.files[0];
+    reader.onload=()=>{
+      const img=new Image();
 
-  if (!file) return;
+      img.onload=()=>{
+        const maxSide=850;
+        const scale=Math.min(1,maxSide/Math.max(img.width,img.height));
+        const canvas=document.createElement("canvas");
+        canvas.width=Math.max(1,Math.round(img.width*scale));
+        canvas.height=Math.max(1,Math.round(img.height*scale));
 
-  if (!file.type.startsWith("image/")) {
+        const ctx=canvas.getContext("2d");
+        if(!ctx){
+          reject(new Error("تعذر تجهيز الصورة."));
+          return;
+        }
+
+        ctx.drawImage(img,0,0,canvas.width,canvas.height);
+
+        let quality=0.72;
+        let result=canvas.toDataURL("image/jpeg",quality);
+
+        while(result.length>380000&&quality>0.32){
+          quality-=0.08;
+          result=canvas.toDataURL("image/jpeg",quality);
+        }
+
+        if(result.length>380000){
+          reject(new Error("الصورة كبيرة جداً. اختر صورة أصغر."));
+        }else{
+          resolve(result);
+        }
+      };
+
+      img.onerror=()=>reject(new Error("تعذر قراءة الصورة."));
+      img.src=reader.result;
+    };
+
+    reader.onerror=()=>reject(new Error("تعذرت قراءة الملف."));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function handlePhoneImage(input){
+  const file=input.files&&input.files[0];
+  if(!file)return;
+
+  if(!file.type.startsWith("image/")){
     alert("الرجاء اختيار صورة فقط.");
-    input.value = "";
+    input.value="";
     return;
   }
 
-  const label = document.getElementById("selectedImageLabel");
-  label.textContent = "جارٍ تجهيز الصورة...";
+  const label=document.getElementById("selectedImageLabel");
+  label.textContent="جارٍ تجهيز الصورة...";
 
-  try {
-    const dataUrl = await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-
-      reader.onload = () => {
-        const img = new Image();
-
-        img.onload = () => {
-          const maxSide = 900;
-          const scale = Math.min(
-            1,
-            maxSide / Math.max(img.width, img.height)
-          );
-
-          const canvas = document.createElement("canvas");
-          canvas.width = Math.round(img.width * scale);
-          canvas.height = Math.round(img.height * scale);
-
-          const ctx = canvas.getContext("2d");
-
-          if (!ctx) {
-            reject(new Error("تعذر تجهيز الصورة."));
-            return;
-          }
-
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-          let quality = 0.75;
-          let result = canvas.toDataURL("image/jpeg", quality);
-
-          while (result.length > 600000 && quality > 0.3) {
-            quality -= 0.1;
-            result = canvas.toDataURL("image/jpeg", quality);
-          }
-
-          if (result.length > 600000) {
-            reject(new Error("الصورة كبيرة جداً. اختر صورة أصغر."));
-          } else {
-            resolve(result);
-          }
-        };
-
-        img.onerror = () => reject(new Error("تعذر قراءة الصورة."));
-        img.src = reader.result;
-      };
-
-      reader.onerror = () => reject(new Error("تعذرت قراءة الملف."));
-      reader.readAsDataURL(file);
-    });
-
-    const imageField = document.getElementById("productImage");
-    const preview = document.getElementById("productImagePreview");
-
-    imageField.value = dataUrl;
-    preview.src = dataUrl;
-
-    label.textContent = "تم اختيار الصورة وتجهيزها بنجاح ✓";
-
-  } catch (error) {
-    alert(error.message || "حدث خطأ أثناء تجهيز الصورة.");
-    label.textContent = "لم يتم اختيار صورة.";
+  try{
+    const dataUrl=await compressPhoneImage(file);
+    setProductImage(dataUrl);
+    label.textContent="تم اختيار صورة الهاتف وتجهيزها بنجاح ✓";
+  }catch(error){
+    alert(error.message||"حدث خطأ أثناء تجهيز الصورة.");
+    label.textContent="لم يتم اختيار صورة.";
   }
 
-  input.value = "";
+  input.value="";
 }
 
-function setProductImage(url) {
-  const safeUrl = url || fallbackImage;
+function setProductImage(url){
+  const safeUrl=url||fallbackImage;
+  document.getElementById("productImage").value=safeUrl;
 
-  document.getElementById("productImage").value = safeUrl;
+  const preview=document.getElementById("productImagePreview");
+  preview.src=safeUrl;
+  preview.onerror=()=>{preview.src=fallbackImage;};
 
-  const preview = document.getElementById("productImagePreview");
-  preview.src = safeUrl;
-
-  preview.onerror = () => {
-    preview.src = fallbackImage;
-  };
-
-  const photo = imageLibrary.find(x => x.url === safeUrl);
-
-  document.getElementById("selectedImageLabel").textContent =
-    "الصورة المختارة: " + (photo ? photo.name : "صورة المنتج");
+  const photo=imageLibrary.find(x=>x.url===safeUrl);
+  document.getElementById("selectedImageLabel").textContent=
+    "الصورة المختارة: "+(photo?photo.name:"صورة من الهاتف أو صورة المنتج");
 }
 
+/* اختيار صورة من الهاتف أثناء تعديل المنتج */
+function choosePhoneImageForEdit(){
+  return new Promise(resolve=>{
+    const picker=document.createElement("input");
+    picker.type="file";
+    picker.accept="image/*";
 
-/* عند تغيير القسم، نختار صورته الافتراضية إذا لم يحدد المستخدم صورة */
+    picker.onchange=async()=>{
+      const file=picker.files&&picker.files[0];
+      if(!file){
+        resolve(null);
+        return;
+      }
+
+      if(!file.type.startsWith("image/")){
+        alert("الرجاء اختيار صورة فقط.");
+        resolve(null);
+        return;
+      }
+
+      try{
+        resolve(await compressPhoneImage(file));
+      }catch(error){
+        alert(error.message||"تعذر تجهيز الصورة.");
+        resolve(null);
+      }
+    };
+
+    picker.click();
+  });
+}
+
 document.getElementById("productCategory").addEventListener("change",()=>{
   const current=document.getElementById("productImage").value;
   if(!current){
@@ -474,19 +435,14 @@ document.getElementById("productCategory").addEventListener("change",()=>{
 });
 
 const STATUS_LABELS={
-  new:"جديد",
-  preparing:"قيد التجهيز",
-  out_for_delivery:"خرج للتوصيل",
-  completed:"مكتمل",
-  cancelled:"ملغي"
+new:"جديد",preparing:"قيد التجهيز",
+out_for_delivery:"خرج للتوصيل",completed:"مكتمل",cancelled:"ملغي"
 };
 
 const STATUS_CLASSES={
-  new:"status-new",
-  preparing:"status-preparing",
-  out_for_delivery:"status-delivery",
-  completed:"status-completed",
-  cancelled:"status-cancelled"
+new:"status-new",preparing:"status-preparing",
+out_for_delivery:"status-delivery",
+completed:"status-completed",cancelled:"status-cancelled"
 };
 
 auth.onAuthStateChanged(user=>{
@@ -499,6 +455,7 @@ auth.onAuthStateChanged(user=>{
     stopOrdersListener();
     loginBox.classList.remove("hidden");
     dashboard.classList.add("hidden");
+
     if(user){
       auth.signOut();
       alert("ليس لديك صلاحية الدخول إلى لوحة الإدارة");
@@ -649,7 +606,6 @@ function notifyNewOrder(id,order){
   const customer=order.customerName||"زبون جديد";
 
   if(soundEnabled)playNotificationSound();
-
   setNotificationStatus("وصل طلب جديد من "+customer+" — رقم الطلب: "+id);
 
   if("Notification" in window&&Notification.permission==="granted"){
@@ -666,7 +622,7 @@ function notifyNewOrder(id,order){
       };
     }catch(error){
       console.warn("Browser notification could not be shown:",error);
-      setNotificationStatus("وصل طلب جديد، لكن Chrome لم يعرض الإشعار. افتح لوحة الإدارة لمشاهدة الطلب.");
+      setNotificationStatus("وصل طلب جديد، لكن Chrome لم يعرض الإشعار.");
     }
   }
 }
@@ -684,7 +640,6 @@ function startOrdersListener(){
     .orderBy("createdAt","desc")
     .onSnapshot(snapshot=>{
       const previousIds=new Set(knownOrderIds);
-
       allOrders=snapshot.docs.map(doc=>({id:doc.id,data:doc.data()}));
 
       if(firstOrdersSnapshot){
@@ -695,11 +650,9 @@ function startOrdersListener(){
         snapshot.docChanges().forEach(change=>{
           if(change.type==="added"){
             const id=change.doc.id;
-
             if(!previousIds.has(id)&&!knownOrderIds.has(id)&&!change.doc.metadata.hasPendingWrites){
               notifyNewOrder(id,change.doc.data());
             }
-
             knownOrderIds.add(id);
           }
         });
@@ -707,12 +660,10 @@ function startOrdersListener(){
 
       updateStats();
       renderOrders();
-
     },error=>{
       console.error("Orders listener error:",error);
       area.textContent="تعذر الاتصال المباشر بالطلبات: "+error.message;
       setNotificationStatus("تعذر تحديث الطلبات تلقائياً. تحقق من الاتصال والصلاحيات.");
-
       ordersUnsubscribe=null;
     });
 }
@@ -722,24 +673,18 @@ function stopOrdersListener(){
     ordersUnsubscribe();
     ordersUnsubscribe=null;
   }
-
   firstOrdersSnapshot=true;
   knownOrderIds=new Set();
 }
 
 function escapeHTML(value){
   return String(value??"").replace(/[&<>"']/g,char=>({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#039;"
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
   }[char]));
 }
 
 function parseAddons(text){
   const lines=String(text||"").split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-
   if(lines.length>10)throw new Error("الحد الأقصى 10 إضافات لكل وجبة.");
 
   return lines.map(line=>{
@@ -753,7 +698,6 @@ function parseAddons(text){
     if(!name||name.length>50||!priceText||!Number.isSafeInteger(price)||price<0||price>50000){
       throw new Error("تحقق من اسم وسعر كل إضافة.");
     }
-
     return {name,price};
   });
 }
@@ -802,7 +746,6 @@ async function loadOrders(){
     allOrders=snapshot.docs.map(doc=>({id:doc.id,data:doc.data()}));
     updateStats();
     renderOrders();
-
     if(!ordersUnsubscribe)startOrdersListener();
   }catch(error){
     area.textContent="حدث خطأ أثناء تحميل الطلبات: "+error.message;
@@ -830,7 +773,6 @@ function renderOrders(){
 
   filtered.forEach(({id,data:order})=>{
     const items=Array.isArray(order.items)?order.items:[];
-
     const itemsHTML=items.map(item=>`
       <div class="item">
         <b>${escapeHTML(item.name)}</b><br>
@@ -874,7 +816,6 @@ function renderOrders(){
     card.querySelector(".saveStatus").addEventListener("click",async()=>{
       const btn=card.querySelector(".saveStatus");
       btn.disabled=true;
-
       try{
         await db.collection("orders").doc(id).update({status:select.value});
         alert("تم تحديث حالة الطلب.");
@@ -891,7 +832,6 @@ function renderOrders(){
 
 function printInvoice(id,order){
   const items=Array.isArray(order.items)?order.items:[];
-
   const rows=items.map(item=>`
     <tr>
       <td>${escapeHTML(item.name)}${item.optionsText?"<br><small>الإضافات: "+escapeHTML(item.optionsText)+"</small>":""}</td>
@@ -946,25 +886,14 @@ function printInvoice(id,order){
 }
 
 /* إضافة منتج */
-
-/* إضافة منتج */
 async function addProduct(){
   const name=document.getElementById("productName").value.trim();
   const category=document.getElementById("productCategory").value.trim();
   const price=Number(document.getElementById("productPrice").value);
   const saleText=document.getElementById("productSalePrice").value.trim();
   const salePrice=saleText?Number(saleText):null;
-
   const imageUrl=document.getElementById("productImage").value.trim();
-
-  if(imageUrl.startsWith("data:image/") && imageUrl.length>600000){
-    alert("حجم الصورة كبير. اختر صورة أخرى.");
-    return;
-  }
-
   const description=document.getElementById("productDescription").value.trim();
-
-  let addons=[];
 
   if(!name||!category||!Number.isSafeInteger(price)||price<=0){
     alert("أدخل اسم المنتج والقسم وسعراً أساسياً صحيحاً.");
@@ -976,6 +905,12 @@ async function addProduct(){
     return;
   }
 
+  if(imageUrl.startsWith("data:image/")&&imageUrl.length>380000){
+    alert("حجم الصورة كبير. اختر صورة أخرى أصغر.");
+    return;
+  }
+
+  let addons=[];
   try{
     addons=parseAddons(document.getElementById("productAddons").value);
   }catch(error){
@@ -999,32 +934,22 @@ async function addProduct(){
     };
 
     if(salePrice!==null)data.salePrice=salePrice;
-
     await productsRef.add(data);
 
     alert("تمت إضافة المنتج بنجاح.");
 
-    [
-      "productName",
-      "productCategory",
-      "productPrice",
-      "productSalePrice",
-      "productImage",
-      "productDescription",
-      "productAddons"
-    ].forEach(id=>document.getElementById(id).value="");
+    ["productName","productCategory","productPrice","productSalePrice","productImage","productDescription","productAddons"]
+      .forEach(id=>document.getElementById(id).value="");
 
     document.getElementById("productImagePreview").src=fallbackImage;
     document.getElementById("phoneImageInput").value="";
     document.getElementById("selectedImageLabel").textContent="لم يتم اختيار صورة بعد.";
 
     loadProducts();
-
   }catch(error){
     alert("تعذر إضافة المنتج: "+error.message);
   }
 }
-
 
 /* عرض المنتجات */
 async function loadProducts(){
@@ -1104,14 +1029,12 @@ async function loadProducts(){
       item.appendChild(actions);
       list.appendChild(item);
     });
-
   }catch(error){
     list.textContent="خطأ في تحميل المنتجات: "+error.message;
   }
 }
 
-/* تعديل المنتج مع معرض الصور */
-
+/* تعديل المنتج */
 async function editProduct(id,product){
   const name=prompt("اسم المنتج:",product.name||"");
   if(name===null)return;
@@ -1121,12 +1044,10 @@ async function editProduct(id,product){
 
   const priceText=prompt("السعر الأساسي بالدينار:",product.price||"");
   if(priceText===null)return;
-
   const price=Number(priceText);
 
   const saleText=prompt("سعر العرض (اتركه فارغاً لإلغاء العرض):",product.salePrice||"");
   if(saleText===null)return;
-
   const salePrice=saleText.trim()?Number(saleText):null;
 
   const description=prompt("وصف المنتج:",product.description||"");
@@ -1149,7 +1070,6 @@ async function editProduct(id,product){
   }
 
   let addons=[];
-
   try{
     addons=parseAddons(addonsText);
   }catch(error){
@@ -1157,10 +1077,7 @@ async function editProduct(id,product){
     return;
   }
 
-  let finalImage=
-    product.imageUrl||
-    categoryImages[category.trim()]||
-    fallbackImage;
+  let finalImage=product.imageUrl||categoryImages[category.trim()]||fallbackImage;
 
   const choosePhone=confirm(
     "هل تريد اختيار صورة جديدة من معرض الهاتف؟\n\nموافق: اختيار من الهاتف\nإلغاء: اختيار من الصور الجاهزة"
@@ -1168,13 +1085,15 @@ async function editProduct(id,product){
 
   if(choosePhone){
     const phoneImage=await choosePhoneImageForEdit();
-    if(phoneImage) finalImage=phoneImage;
+    if(phoneImage)finalImage=phoneImage;
   }else{
-    const selectedImage=await openImagePicker(
-      category.trim(),
-      finalImage
-    );
-    if(selectedImage) finalImage=selectedImage;
+    const selectedImage=await openImagePicker(category.trim(),finalImage);
+    if(selectedImage)finalImage=selectedImage;
+  }
+
+  if(finalImage.startsWith("data:image/")&&finalImage.length>380000){
+    alert("حجم الصورة كبير جداً. اختر صورة أصغر.");
+    return;
   }
 
   try{
@@ -1192,15 +1111,12 @@ async function editProduct(id,product){
       firebase.firestore.FieldValue.delete():salePrice;
 
     await productsRef.doc(id).update(update);
-
     alert("تم تعديل المنتج بنجاح.");
     loadProducts();
-
   }catch(error){
     alert("تعذر تعديل المنتج: "+error.message);
   }
 }
-
 
 async function toggleProduct(id,currentStatus){
   try{
@@ -1208,7 +1124,6 @@ async function toggleProduct(id,currentStatus){
       available:currentStatus===false,
       updatedAt:firebase.firestore.FieldValue.serverTimestamp()
     });
-
     loadProducts();
   }catch(error){
     alert("تعذر تغيير حالة المنتج: "+error.message);
@@ -1229,6 +1144,7 @@ async function deleteProduct(id){
 
 updateBrowserNotificationButton();
 updateSoundButton();
+setProductImage(fallbackImage);
 </script>
 </body>
 </html>
