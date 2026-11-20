@@ -152,14 +152,51 @@ hr{border:0;border-top:1px solid #eee;margin:17px 0}
 <input id="productPrice" type="number" min="1" placeholder="السعر الأساسي بالدينار">
 <input id="productSalePrice" type="number" min="1" placeholder="سعر العرض (اختياري)">
 
+
 <div class="image-picker-area">
-<b>صورة المنتج</b>
-<p class="muted">اختر صورة جاهزة من المعرض. ستظهر الصورة في منيو الزبائن بعد حفظ المنتج.</p>
-<img id="productImagePreview" class="image-preview" alt="معاينة صورة المنتج">
-<input id="productImage" type="hidden">
-<button type="button" class="image-picker-button" onclick="openAddImagePicker()">اختيار صورة جاهزة من المعرض 🖼️</button>
-<p id="selectedImageLabel" class="muted">لم يتم اختيار صورة بعد.</p>
+  <b>صورة المنتج</b>
+
+  <p class="muted">
+    اختر صورة من هاتفك أو استخدم الصور الجاهزة.
+  </p>
+
+  <img
+    id="productImagePreview"
+    class="image-preview"
+    alt="معاينة صورة المنتج"
+  >
+
+  <input id="productImage" type="hidden">
+
+  <input
+    id="phoneImageInput"
+    type="file"
+    accept="image/*"
+    hidden
+    onchange="handlePhoneImage(this)"
+  >
+
+  <button
+    type="button"
+    class="image-picker-button"
+    onclick="document.getElementById('phoneImageInput').click()"
+  >
+    اختيار صورة من الهاتف 📱
+  </button>
+
+  <button
+    type="button"
+    class="image-picker-button"
+    onclick="openAddImagePicker()"
+  >
+    اختيار صورة جاهزة 🖼️
+  </button>
+
+  <p id="selectedImageLabel" class="muted">
+    لم يتم اختيار صورة بعد.
+  </p>
 </div>
+
 
 <textarea id="productDescription" placeholder="وصف المنتج"></textarea>
 <textarea id="productAddons" placeholder="الإضافات الاختيارية، كل إضافة في سطر بهذا الشكل:
