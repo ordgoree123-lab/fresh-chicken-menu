@@ -107,6 +107,88 @@ footer{background:#201a1c;color:#d8cdd0;text-align:center;padding:25px 15px 95px
  .card-bottom{align-items:flex-start;flex-direction:column}
  .add-btn{width:100%}
 }
+
+/* ===== 3D INTERACTIVE DESIGN ===== */
+.products{
+  perspective:1100px;
+  gap:18px;
+}
+.card{
+  position:relative;
+  transform-style:preserve-3d;
+  border:1px solid #f0dce0;
+  border-radius:20px;
+  box-shadow:0 8px 15px rgba(80,10,25,.06),0 18px 30px rgba(80,10,25,.08);
+  transition:transform .35s ease,box-shadow .35s ease;
+  animation:cardAppear .55s ease both;
+}
+.card:hover{
+  transform:translateY(-9px) rotateX(3deg);
+  box-shadow:0 14px 25px rgba(80,10,25,.12),0 25px 40px rgba(80,10,25,.12);
+}
+.photo-wrap{
+  transform:translateZ(12px);
+  background:linear-gradient(145deg,#fff0f2,#f4dce1);
+}
+.food-photo{transition:transform .5s ease,filter .4s ease}
+.card:hover .food-photo{transform:scale(1.08);filter:saturate(1.12)}
+.card-content{transform:translateZ(8px)}
+.add-btn{
+  position:relative;
+  overflow:hidden;
+  border:1px solid #d82b48;
+  background:linear-gradient(145deg,#d52240,#920d25);
+  box-shadow:0 5px 0 #71091c,0 9px 15px rgba(181,18,45,.2);
+  transition:transform .15s ease,box-shadow .15s ease;
+}
+.add-btn:active{
+  transform:translateY(4px);
+  box-shadow:0 1px 0 #71091c,0 3px 7px rgba(181,18,45,.2);
+}
+.categories button{transition:transform .2s ease,background .2s ease,box-shadow .2s ease}
+.categories button:active{transform:scale(.94)}
+.categories button.active{box-shadow:0 5px 0 #790d21,0 9px 16px #b5122d25}
+.cart-bar button{
+  box-shadow:0 5px 0 #65091b,0 10px 22px rgba(80,10,25,.2);
+  transition:transform .15s ease,box-shadow .15s ease;
+}
+.cart-bar button:active{transform:translateY(4px);box-shadow:0 1px 0 #65091b}
+.hero-art{
+  position:relative;
+  transform:translateZ(35px) rotate(-9deg);
+  animation:heroFloat 4s ease-in-out infinite;
+  filter:drop-shadow(0 22px 15px #43061588);
+}
+.hero{perspective:900px}
+.hero-copy{transform:translateZ(15px)}
+.cart-box{animation:cartAppear .3s ease;box-shadow:0 25px 70px rgba(0,0,0,.25)}
+@keyframes cardAppear{
+  from{opacity:0;transform:translateY(18px) rotateX(5deg)}
+  to{opacity:1;transform:translateY(0) rotateX(0)}
+}
+@keyframes heroFloat{
+  0%,100%{transform:translateY(0) translateZ(35px) rotate(-9deg)}
+  50%{transform:translateY(-12px) translateZ(35px) rotate(-5deg)}
+}
+@keyframes cartAppear{
+  from{opacity:0;transform:translateY(25px) scale(.96)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+@media(hover:none){
+  .card:active{
+    transform:scale(.97) translateY(-3px);
+    box-shadow:0 12px 25px rgba(80,10,25,.15);
+  }
+  .add-btn:active{transform:scale(.94)}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    scroll-behavior:auto!important;
+    transition-duration:.01ms!important;
+  }
+}
 </style>
 </head>
 <body>
