@@ -40,6 +40,10 @@ button.blue{background:#1769aa}
 .status-delivery{background:#e9e0ff;color:#5633a3}
 .status-completed{background:#dff5e5;color:#176b35}
 .status-cancelled{background:#ffe1e1;color:#a51d1d}
+.notification-panel{background:#fff7f8;border:1px solid #f0d4d9;border-radius:10px;padding:12px;margin:12px 0}
+.notification-actions{display:flex;gap:8px;flex-wrap:wrap}
+.notification-actions button{flex:1;min-width:150px}
+#notificationStatus{margin:5px 0 0}
 hr{border:0;border-top:1px solid #eee;margin:17px 0}
 @media(max-width:600px){.filters{grid-template-columns:1fr}.container{padding:9px}.box{padding:13px}}
 @media print{body{background:white}.no-print,header,.container>.box:not(#printArea){display:none!important}#printArea{display:block!important;box-shadow:none;border:0}.order{break-inside:avoid}}
@@ -74,6 +78,15 @@ hr{border:0;border-top:1px solid #eee;margin:17px 0}
 
     <div class="box">
       <h3>إدارة الطلبات 📦</h3>
+      <div class="notification-panel no-print">
+        <b>تنبيهات الطلبات الجديدة 🔔</b>
+        <p class="muted">فعّل الصوت وإشعارات Chrome ليصلك تنبيه عند وصول طلب جديد. يجب إبقاء لوحة الإدارة مفتوحة لاستقبال التنبيهات بهذه المرحلة.</p>
+        <div class="notification-actions">
+          <button id="soundButton" class="green" onclick="toggleSound()">تفعيل الصوت</button>
+          <button id="browserNotificationButton" class="blue" onclick="enableBrowserNotifications()">تفعيل إشعارات Chrome</button>
+        </div>
+        <p id="notificationStatus" class="muted" aria-live="polite">التنبيهات جاهزة بعد تسجيل الدخول.</p>
+      </div>
       <button onclick="loadOrders()">تحديث الطلبات</button>
       <div class="filters">
         <input id="orderSearch" placeholder="بحث باسم الزبون أو رقم الهاتف أو رقم الطلب" oninput="renderOrders()">
@@ -133,6 +146,13 @@ const ADMIN_UID="Q5ugDQ5ZJIOpS5tO9ZRHnnvUaTB3";
 const productsRef=db.collection("products");
 let allOrders=[];
 
+// إعدادات التنبيهات الحية
+let ordersUnsubscribe=null;
+let firstOrdersSnapshot=true;
+let knownOrderIds=new Set();
+let soundEnabled=false;
+let audioContext=null;
+
 const STATUS_LABELS={
   new:"جديد",
   preparing:"قيد التجهيز",
@@ -151,12 +171,15 @@ const STATUS_CLASSES={
 auth.onAuthStateChanged(user=>{
   if(user&&user.uid===ADMIN_UID){
     loginBox.classList.add("hidden");dashboard.classList.remove("hidden");
-    loadOrders();loadProducts();
+    startOrdersListener();
+    loadProducts();
   }else{
+    stopOrdersListener();
     loginBox.classList.remove("hidden");dashboard.classList.add("hidden");
     if(user){auth.signOut();alert("ليس لديك صلاحية الدخول إلى لوحة الإدارة");}
   }
 });
+
 async function login(){
   const email=document.getElementById("email").value.trim();
   const password=document.getElementById("password").value;
@@ -174,6 +197,148 @@ async function login(){
   }
 }
 async function logout(){await auth.signOut();}
+
+function setNotificationStatus(text){
+  const el=document.getElementById("notificationStatus");
+  if(el)el.textContent=text;
+}
+function updateSoundButton(){
+  const btn=document.getElementById("soundButton");
+  if(!btn)return;
+  btn.textContent=soundEnabled?"إيقاف الصوت":"تفعيل الصوت";
+  btn.className=soundEnabled?"secondary":"green";
+}
+async function toggleSound(){
+  try{
+    const AudioCtx=window.AudioContext||window.webkitAudioContext;
+    if(!AudioCtx){
+      setNotificationStatus("متصفحك لا يدعم تشغيل صوت التنبيه.");
+      return;
+    }
+    if(!audioContext)audioContext=new AudioCtx();
+    if(audioContext.state==="suspended")await audioContext.resume();
+    soundEnabled=!soundEnabled;
+    updateSoundButton();
+    if(soundEnabled){
+      playNotificationSound();
+      setNotificationStatus("تم تفعيل صوت التنبيه. سيصدر صوت عند وصول طلب جديد.");
+    }else{
+      setNotificationStatus("تم إيقاف صوت التنبيه، وما زالت إشعارات الطلبات تعمل.");
+    }
+  }catch(error){
+    console.error("Audio Error:",error);
+    setNotificationStatus("تعذر تفعيل الصوت. جرّب مرة أخرى من Chrome.");
+  }
+}
+function playNotificationSound(){
+  if(!soundEnabled||!audioContext)return;
+  try{
+    const oscillator=audioContext.createOscillator();
+    const gain=audioContext.createGain();
+    oscillator.type="sine";
+    oscillator.frequency.setValueAtTime(880,audioContext.currentTime);
+    oscillator.frequency.setValueAtTime(660,audioContext.currentTime+0.16);
+    gain.gain.setValueAtTime(0.0001,audioContext.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.18,audioContext.currentTime+0.025);
+    gain.gain.exponentialRampToValueAtTime(0.0001,audioContext.currentTime+0.38);
+    oscillator.connect(gain);gain.connect(audioContext.destination);
+    oscillator.start();oscillator.stop(audioContext.currentTime+0.4);
+  }catch(error){console.warn("Notification sound failed:",error);}
+}
+async function enableBrowserNotifications(){
+  if(!("Notification" in window)){
+    setNotificationStatus("هذا المتصفح لا يدعم إشعارات الويب.");
+    return;
+  }
+  try{
+    const permission=await Notification.requestPermission();
+    updateBrowserNotificationButton();
+    if(permission==="granted"){
+      setNotificationStatus("تم السماح بإشعارات Chrome. ستظهر عند وصول طلب جديد ما دامت اللوحة مفتوحة.");
+      try{
+        new Notification("Fresh Chicken",{
+          body:"تم تفعيل إشعارات الطلبات الجديدة بنجاح.",
+          tag:"fresh-chicken-notification-test"
+        });
+      }catch(error){console.warn("Test notification unavailable:",error);}
+    }else if(permission==="denied"){
+      setNotificationStatus("تم حظر الإشعارات. يمكنك السماح بها من إعدادات الموقع في Chrome.");
+    }else{
+      setNotificationStatus("لم يتم منح إذن الإشعارات بعد.");
+    }
+  }catch(error){
+    console.error("Notification permission error:",error);
+    setNotificationStatus("تعذر طلب إذن الإشعارات: "+error.message);
+  }
+}
+function updateBrowserNotificationButton(){
+  const btn=document.getElementById("browserNotificationButton");
+  if(!btn)return;
+  if(!("Notification" in window)){btn.textContent="الإشعارات غير مدعومة";btn.disabled=true;return;}
+  if(Notification.permission==="granted"){btn.textContent="إشعارات Chrome مفعّلة";btn.className="green";}
+  else if(Notification.permission==="denied"){btn.textContent="الإشعارات محظورة من Chrome";btn.className="secondary";}
+  else{btn.textContent="تفعيل إشعارات Chrome";btn.className="blue";}
+}
+function notifyNewOrder(id,order){
+  const customer=order.customerName||"زبون جديد";
+  if(soundEnabled)playNotificationSound();
+  setNotificationStatus("وصل طلب جديد من "+customer+" — رقم الطلب: "+id);
+  if("Notification" in window&&Notification.permission==="granted"){
+    try{
+      const notification=new Notification("طلب جديد من Fresh Chicken",{
+        body:"الزبون: "+customer+"\nرقم الطلب: "+id+"\nالمجموع: "+formatMoney(order.total),
+        tag:"fresh-order-"+id,
+        renotify:false
+      });
+      notification.onclick=()=>{
+        window.focus();
+        notification.close();
+      };
+    }catch(error){
+      console.warn("Browser notification could not be shown:",error);
+      setNotificationStatus("وصل طلب جديد، لكن Chrome لم يعرض الإشعار. افتح لوحة الإدارة لمشاهدة الطلب.");
+    }
+  }
+}
+function startOrdersListener(){
+  if(ordersUnsubscribe)return;
+  firstOrdersSnapshot=true;
+  knownOrderIds=new Set();
+  const area=document.getElementById("orders");
+  area.textContent="جارٍ الاتصال بالطلبات...";
+  ordersUnsubscribe=db.collection("orders")
+    .orderBy("createdAt","desc")
+    .onSnapshot(snapshot=>{
+      const previousIds=new Set(knownOrderIds);
+      allOrders=snapshot.docs.map(doc=>({id:doc.id,data:doc.data()}));
+      if(firstOrdersSnapshot){
+        snapshot.docs.forEach(doc=>knownOrderIds.add(doc.id));
+        firstOrdersSnapshot=false;
+        setNotificationStatus("الاتصال المباشر بالطلبات يعمل. الطلبات القديمة لن تصدر تنبيهاً.");
+      }else{
+        snapshot.docChanges().forEach(change=>{
+          if(change.type==="added"){
+            const id=change.doc.id;
+            if(!previousIds.has(id)&&!knownOrderIds.has(id)&&!change.doc.metadata.hasPendingWrites){
+              notifyNewOrder(id,change.doc.data());
+            }
+            knownOrderIds.add(id);
+          }
+        });
+      }
+      updateStats();
+      renderOrders();
+    },error=>{
+      console.error("Orders listener error:",error);
+      area.textContent="تعذر الاتصال المباشر بالطلبات: "+error.message;
+      setNotificationStatus("تعذر تحديث الطلبات تلقائياً. تحقق من الاتصال والصلاحيات.");
+    });
+}
+function stopOrdersListener(){
+  if(ordersUnsubscribe){ordersUnsubscribe();ordersUnsubscribe=null;}
+  firstOrdersSnapshot=true;
+  knownOrderIds=new Set();
+}
 function escapeHTML(value){
   return String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[char]));
 }
@@ -215,6 +380,7 @@ async function loadOrders(){
     const snapshot=await db.collection("orders").orderBy("createdAt","desc").get();
     allOrders=snapshot.docs.map(doc=>({id:doc.id,data:doc.data()}));
     updateStats();renderOrders();
+    if(!ordersUnsubscribe)startOrdersListener();
   }catch(error){area.textContent="حدث خطأ أثناء تحميل الطلبات: "+error.message;}
 }
 function renderOrders(){
@@ -261,7 +427,7 @@ function renderOrders(){
       const btn=card.querySelector(".saveStatus");btn.disabled=true;
       try{
         await db.collection("orders").doc(id).update({status:select.value});
-        alert("تم تحديث حالة الطلب.");await loadOrders();
+        alert("تم تحديث حالة الطلب.");
       }catch(error){alert("تعذر تحديث الحالة: "+error.message);btn.disabled=false;}
     });
     card.querySelector(".printOrder").addEventListener("click",()=>printInvoice(id,order));
@@ -370,6 +536,9 @@ async function deleteProduct(id){
   try{await productsRef.doc(id).delete();alert("تم حذف المنتج.");loadProducts();}
   catch(error){alert("تعذر حذف المنتج: "+error.message);}
 }
+
+updateBrowserNotificationButton();
+updateSoundButton();
 </script>
 </body>
 </html>
