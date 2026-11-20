@@ -25,6 +25,8 @@ button.green{background:#168b45}
 .product img{width:100%;max-width:180px;height:120px;object-fit:cover;border-radius:8px}
 .product-actions{display:flex;gap:8px;flex-wrap:wrap}
 .product-actions button{flex:1;min-width:110px}
+.addon-summary{font-size:13px;line-height:1.8;background:#fff7f8;padding:9px;border-radius:8px}
+.sale-price{color:#c8102e;font-weight:bold}
 #importMessage{font-size:14px;line-height:1.7}
 </style>
 </head>
@@ -50,9 +52,14 @@ button.green{background:#168b45}
       <h4>إضافة منتج جديد</h4>
       <input id="productName" placeholder="اسم المنتج">
       <input id="productCategory" placeholder="القسم">
-      <input id="productPrice" type="number" placeholder="السعر بالدينار">
+      <input id="productPrice" type="number" min="1" placeholder="السعر الأساسي بالدينار">
+      <input id="productSalePrice" type="number" min="1" placeholder="سعر العرض (اختياري)">
       <input id="productImage" placeholder="رابط صورة المنتج">
       <textarea id="productDescription" placeholder="وصف المنتج"></textarea>
+      <textarea id="productAddons" placeholder="الإضافات الاختيارية، كل إضافة في سطر بهذا الشكل:
+جبن إضافي:1000
+صوص:500"></textarea>
+      <p class="muted">يمكن ترك سعر العرض والإضافات فارغين. الحد الأقصى 10 إضافات لكل وجبة.</p>
       <button onclick="addProduct()">إضافة المنتج</button>
       <hr>
       <h4>نقل المنتجات القديمة</h4>
@@ -115,6 +122,20 @@ async function logout(){await auth.signOut();}
 function escapeHTML(value){
   return String(value ?? "").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[char]));
 }
+
+function parseAddons(text){
+  const lines=String(text||"").split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  if(lines.length>10)throw new Error("الحد الأقصى 10 إضافات لكل وجبة.");
+  return lines.map(line=>{
+    const pos=line.lastIndexOf(":");
+    if(pos<1)throw new Error("صيغة الإضافة غير صحيحة. استخدم: اسم الإضافة:السعر");
+    const name=line.slice(0,pos).trim(),priceText=line.slice(pos+1).trim(),price=Number(priceText);
+    if(!name||name.length>50||!priceText||!Number.isSafeInteger(price)||price<0||price>50000)throw new Error("تحقق من اسم وسعر كل إضافة. السعر يجب أن يكون رقماً صحيحاً من 0 إلى 50000.");
+    return {name,price};
+  });
+}
+function addonsToText(addons){return Array.isArray(addons)?addons.map(a=>a.name+":"+a.price).join("\n"):"";}
+function validSalePrice(price,sale){return sale===null||(Number.isSafeInteger(sale)&&sale>0&&sale<price);}
 
 // المنتجات القديمة وصورها الافتراضية حسب القسم
 const categoryImages = {
@@ -254,7 +275,7 @@ async function loadOrders(){
     snapshot.forEach(doc=>{
       const order=doc.data(),id=doc.id;
       const items=Array.isArray(order.items)?order.items:[];
-      const itemsHTML=items.map(item=>`<div class="item">${escapeHTML(item.name)} — الكمية: ${escapeHTML(item.quantity)} — السعر: ${escapeHTML(item.price)} ${item.notes?"<br>ملاحظات: "+escapeHTML(item.notes):""}</div>`).join("");
+      const itemsHTML=items.map(item=>`<div class="item"><b>${escapeHTML(item.name)}</b> — الكمية: ${escapeHTML(item.quantity)} — السعر: ${escapeHTML(item.price)} د.ع${item.optionsText?"<br>الإضافات: "+escapeHTML(item.optionsText):""}${item.notes?"<br>ملاحظات: "+escapeHTML(item.notes):""}</div>`).join("");
       const date=order.createdAt?.toDate?order.createdAt.toDate().toLocaleString("ar-IQ"):"غير محدد";
       const card=document.createElement("div");card.className="order";
       card.innerHTML=`
@@ -286,14 +307,21 @@ async function addProduct(){
   const name=document.getElementById("productName").value.trim();
   const category=document.getElementById("productCategory").value.trim();
   const price=Number(document.getElementById("productPrice").value);
+  const saleText=document.getElementById("productSalePrice").value.trim();
+  const salePrice=saleText?Number(saleText):null;
   const imageUrl=document.getElementById("productImage").value.trim();
   const description=document.getElementById("productDescription").value.trim();
-  if(!name||!category||!Number.isSafeInteger(price)||price<=0){alert("أدخل اسم المنتج والقسم وسعراً صحيحاً");return;}
+  let addons=[];
+  if(!name||!category||!Number.isSafeInteger(price)||price<=0){alert("أدخل اسم المنتج والقسم وسعراً أساسياً صحيحاً");return;}
+  if(!validSalePrice(price,salePrice)){alert("سعر العرض يجب أن يكون أقل من السعر الأساسي وأكبر من صفر.");return;}
   if(imageUrl&&!/^https?:\/\/\S+$/i.test(imageUrl)){alert("رابط الصورة غير صحيح");return;}
+  try{addons=parseAddons(document.getElementById("productAddons").value);}catch(error){alert(error.message);return;}
   try{
-    await productsRef.add({name,category,price,imageUrl,description,available:true,featured:false,sortOrder:0,createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+    const data={name,category,price,imageUrl,description,addons,available:true,featured:false,sortOrder:0,createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+    if(salePrice!==null)data.salePrice=salePrice;
+    await productsRef.add(data);
     alert("تمت إضافة المنتج بنجاح");
-    ["productName","productCategory","productPrice","productImage","productDescription"].forEach(id=>document.getElementById(id).value="");
+    ["productName","productCategory","productPrice","productSalePrice","productImage","productDescription","productAddons"].forEach(id=>document.getElementById(id).value="");
     loadProducts();
   }catch(error){alert("تعذر إضافة المنتج: "+error.message);}
 }
@@ -310,11 +338,11 @@ async function loadProducts(){
       const p=doc.data(),item=document.createElement("div");item.className="product";
       const title=document.createElement("h3");title.textContent=p.name||"منتج بدون اسم";
       const category=document.createElement("p");category.textContent="القسم: "+(p.category||"");
-      const price=document.createElement("p");price.textContent="السعر: "+(p.price||0)+" د.ع";
+      const price=document.createElement("p");price.textContent="السعر: "+(p.price||0)+" د.ع"+(Number.isSafeInteger(p.salePrice)&&p.salePrice>0&&p.salePrice<p.price?" | سعر العرض: "+p.salePrice+" د.ع":"");if(p.salePrice)price.className="sale-price";
       const status=document.createElement("p");status.textContent=p.available===false?"الحالة: غير متوفر":"الحالة: متوفر";
       item.append(title,category,price,status);
       if(p.imageUrl&&/^https?:\/\//i.test(p.imageUrl)){const img=document.createElement("img");img.src=p.imageUrl;img.alt=p.name||"صورة المنتج";img.loading="lazy";item.appendChild(img);}
-      const description=document.createElement("p");description.textContent=p.description||"لا يوجد وصف";item.appendChild(description);
+      const description=document.createElement("p");description.textContent=p.description||"لا يوجد وصف";item.appendChild(description);if(Array.isArray(p.addons)&&p.addons.length){const addonInfo=document.createElement("div");addonInfo.className="addon-summary";addonInfo.textContent="الإضافات: "+p.addons.map(a=>a.name+" (+"+a.price+" د.ع)").join("، ");item.appendChild(addonInfo);}
       const actions=document.createElement("div");actions.className="product-actions";
       const edit=document.createElement("button");edit.textContent="تعديل المنتج";edit.onclick=()=>editProduct(doc.id,p);
       const toggle=document.createElement("button");toggle.className="green";toggle.textContent=p.available===false?"إظهار المنتج":"إخفاء المنتج";toggle.onclick=()=>toggleProduct(doc.id,p.available);
@@ -328,14 +356,21 @@ async function loadProducts(){
 async function editProduct(id,product){
   const name=prompt("اسم المنتج:",product.name||"");if(name===null)return;
   const category=prompt("القسم:",product.category||"");if(category===null)return;
-  const priceText=prompt("السعر بالدينار:",product.price||"");if(priceText===null)return;
+  const priceText=prompt("السعر الأساسي بالدينار:",product.price||"");if(priceText===null)return;
   const price=Number(priceText);
+  const saleText=prompt("سعر العرض (اتركه فارغاً لإلغاء العرض):",product.salePrice||"");if(saleText===null)return;
+  const salePrice=saleText.trim()?Number(saleText):null;
   const imageUrl=prompt("رابط الصورة:",product.imageUrl||"");if(imageUrl===null)return;
   const description=prompt("وصف المنتج:",product.description||"");if(description===null)return;
+  const addonsText=prompt("الإضافات، كل إضافة في سطر بصيغة اسم:سعر. اتركه فارغاً لإزالة الإضافات:",addonsToText(product.addons));if(addonsText===null)return;
   if(!name.trim()||!category.trim()||!Number.isSafeInteger(price)||price<=0){alert("البيانات غير صحيحة");return;}
+  if(!validSalePrice(price,salePrice)){alert("سعر العرض يجب أن يكون أقل من السعر الأساسي وأكبر من صفر.");return;}
   if(imageUrl.trim()&&!/^https?:\/\/\S+$/i.test(imageUrl.trim())){alert("رابط الصورة غير صحيح");return;}
+  let addons=[];try{addons=parseAddons(addonsText);}catch(error){alert(error.message);return;}
   try{
-    await productsRef.doc(id).update({name:name.trim(),category:category.trim(),price,imageUrl:imageUrl.trim(),description:description.trim(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+    const update={name:name.trim(),category:category.trim(),price,imageUrl:imageUrl.trim(),description:description.trim(),addons,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+    update.salePrice=salePrice===null?firebase.firestore.FieldValue.delete():salePrice;
+    await productsRef.doc(id).update(update);
     alert("تم تعديل المنتج");loadProducts();
   }catch(error){alert("تعذر تعديل المنتج: "+error.message);}
 }
