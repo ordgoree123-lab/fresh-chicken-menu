@@ -3,90 +3,195 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#c8102e">
+<meta name="theme-color" content="#a90f27">
+<meta name="description" content="Fresh Chicken - أشهى وجبات الدجاج. تصفح المنيو واطلب بسهولة.">
 <title>Fresh Chicken | المنيو</title>
 <style>
+:root{
+  --red:#b5122d;--red-dark:#870d22;--red-soft:#fff0f2;
+  --ink:#202124;--muted:#74777d;--line:#ececef;
+  --surface:#fff;--page:#f6f6f8;--green:#168447;
+  --shadow:0 12px 32px rgba(28,22,24,.08);
+}
 *{box-sizing:border-box}
-body{margin:0;background:#f7f7f7;font-family:Tahoma,Arial;color:#222}
-header{text-align:center;background:white;padding:20px;border-bottom:4px solid #c8102e}
-.logo{font-size:30px;font-weight:bold;color:#c8102e}
-header p{color:#777;margin-bottom:0}
-.hero{background:linear-gradient(135deg,#a90020,#e3263f);color:white;text-align:center;padding:28px 12px}
-.hero h1{margin:0 0 10px}
-.categories{display:flex;overflow-x:auto;gap:8px;padding:14px;background:white;position:sticky;top:0;z-index:5}
-.categories button{white-space:nowrap;border:1px solid #c8102e;background:white;color:#c8102e;border-radius:22px;padding:10px 15px;font-family:inherit}
-.categories button.active{background:#c8102e;color:white}
-main{max-width:1100px;margin:auto;padding:18px 12px 110px}
-h2{color:#c8102e;font-size:22px}
-.products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.card{background:white;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px #0001;display:flex;flex-direction:column}
-.food-photo{width:100%;height:145px;object-fit:cover;background:#fff0f0;display:block}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--page);font-family:Tahoma,Arial,sans-serif;color:var(--ink)}
+button,input,textarea{font:inherit}
+button{cursor:pointer}
+.top-strip{background:var(--red-dark);color:#fff;text-align:center;padding:8px 12px;font-size:12px}
+.site-header{background:#fff;border-bottom:1px solid var(--line)}
+.header-inner{max-width:1180px;margin:auto;padding:15px 18px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:11px;min-width:0}
+.brand-mark{width:48px;height:48px;border-radius:15px;background:var(--red-soft);display:grid;place-items:center;font-size:27px}
+.brand-name{font-size:22px;font-weight:900;color:var(--red);letter-spacing:.1px}
+.brand-tagline{font-size:11px;color:var(--muted);margin-top:4px}
+.header-call{color:var(--red);text-decoration:none;border:1px solid #f0cbd2;padding:10px 14px;border-radius:12px;font-size:13px;font-weight:bold;white-space:nowrap}
+.hero-wrap{background:linear-gradient(120deg,#790d21 0%,#b5122d 55%,#e13a50 100%);color:#fff;overflow:hidden}
+.hero{max-width:1180px;margin:auto;min-height:235px;padding:34px 22px;display:flex;align-items:center;justify-content:space-between;gap:20px;position:relative}
+.hero-copy{max-width:620px;position:relative;z-index:1}
+.hero-kicker{display:inline-block;background:#ffffff20;border:1px solid #ffffff40;border-radius:30px;padding:7px 12px;font-size:12px;margin-bottom:13px}
+.hero h1{font-size:clamp(25px,5vw,42px);line-height:1.35;margin:0 0 9px;font-weight:900}
+.hero p{margin:0;color:#ffe7eb;line-height:1.9;font-size:14px}
+.hero-art{font-size:clamp(90px,17vw,150px);filter:drop-shadow(0 15px 18px #53081766);transform:rotate(-9deg);padding:0 20px}
+.hero-note{margin-top:18px;display:inline-flex;align-items:center;gap:7px;background:#fff;color:var(--red-dark);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:bold}
+.content{max-width:1180px;margin:auto;padding:22px 16px 120px}
+.section-heading{display:flex;justify-content:space-between;align-items:end;gap:12px;margin:4px 0 14px}
+.section-heading h2{font-size:21px;margin:0;color:var(--ink)}
+.section-heading p{font-size:12px;color:var(--muted);margin:5px 0 0}
+.search-wrap{position:relative;margin:0 0 15px}
+.search-wrap span{position:absolute;right:15px;top:50%;transform:translateY(-50%);font-size:17px}
+.search-wrap input{width:100%;border:1px solid var(--line);background:#fff;border-radius:14px;padding:14px 45px 14px 14px;outline:none;box-shadow:0 3px 12px #00000005}
+.search-wrap input:focus{border-color:#d58a98;box-shadow:0 0 0 3px #b5122d12}
+.categories{display:flex;overflow-x:auto;gap:9px;padding:4px 1px 14px;scrollbar-width:thin}
+.categories button{flex:0 0 auto;white-space:nowrap;border:1px solid #e8dadd;background:#fff;color:#5f343c;border-radius:30px;padding:10px 17px;font-size:13px;transition:.2s}
+.categories button.active,.categories button:hover{background:var(--red);border-color:var(--red);color:#fff;box-shadow:0 5px 13px #b5122d25}
+#loadMessage{text-align:center;color:var(--muted);padding:28px 14px;line-height:1.9;background:#fff;border:1px dashed #e3dadd;border-radius:15px}
+.products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.card{background:var(--surface);border:1px solid #eeeeF1;border-radius:17px;overflow:hidden;box-shadow:0 4px 16px rgba(25,20,22,.045);display:flex;flex-direction:column;min-width:0;transition:transform .2s,box-shadow .2s}
+.card:active{transform:scale(.99)}
+.photo-wrap{position:relative;background:#fff0f2;overflow:hidden}
+.food-photo{width:100%;height:145px;object-fit:cover;display:block;transition:transform .35s}
+.card:hover .food-photo{transform:scale(1.035)}
 .card-content{padding:12px;display:flex;flex-direction:column;flex:1}
-.card h3{font-size:15px;line-height:1.6;margin:0 0 8px}
-.price{color:#c8102e;font-weight:bold;margin:8px 0 12px}
-.card button,.send,.close,.wa-link{border:0;border-radius:9px;background:#c8102e;color:white;padding:11px;width:100%;font-size:14px;cursor:pointer;font-family:inherit;text-align:center;text-decoration:none;display:block}
-.card button{margin-top:auto}
-button:disabled{opacity:.6;cursor:not-allowed}
-.cart-bar{position:fixed;bottom:0;right:0;left:0;background:#c8102e;color:white;padding:15px;text-align:center;font-weight:bold;z-index:10;cursor:pointer}
-#cart{display:none;position:fixed;inset:0;background:#0009;z-index:20;padding:12px;overflow:auto}
-.cart-box{background:white;border-radius:15px;padding:18px;max-width:500px;margin:25px auto}
-.cart-item{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #eee;padding:10px 0}
-.cart-item button{border:0;background:#eee;padding:5px 10px;border-radius:6px;font-family:inherit}
-input,textarea{width:100%;padding:12px;margin:7px 0;border:1px solid #ddd;border-radius:8px;font-family:inherit}
-.total{font-size:19px;color:#c8102e;font-weight:bold;margin:15px 0}
-footer{text-align:center;padding:20px;color:#888}
-#successPanel{display:none;background:#f0fff4;border:1px solid #9bd6aa;border-radius:10px;padding:14px;margin-top:14px}
-#successPanel p{line-height:1.8;margin:0 0 12px;color:#175b2a}
-#successPanel .wa-link{background:#168b45}
+.card h3{font-size:14px;line-height:1.7;margin:0 0 5px;font-weight:800}
+.description{font-size:11px;line-height:1.7;color:var(--muted);min-height:18px}
+.card-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;padding-top:12px}
+.price{color:var(--red);font-weight:900;font-size:14px;white-space:nowrap}
+.add-btn{border:0;border-radius:10px;background:var(--red);color:#fff;padding:10px 12px;font-size:12px;font-weight:bold;white-space:nowrap;box-shadow:0 4px 10px #b5122d22}
+.add-btn:active{background:var(--red-dark)}
+.empty-state{grid-column:1/-1;text-align:center;padding:30px 15px;background:#fff;border-radius:15px;color:var(--muted)}
+.cart-bar{position:fixed;bottom:0;right:0;left:0;z-index:10;padding:12px 15px calc(12px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid var(--line);box-shadow:0 -7px 24px #0000000c}
+.cart-bar button{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:650px;width:100%;margin:auto;border:0;border-radius:14px;background:linear-gradient(110deg,var(--red-dark),var(--red));color:#fff;padding:14px 17px;font-weight:bold;font-size:14px}
+.cart-count{background:#ffffff25;border-radius:30px;padding:5px 9px;font-size:12px}
+.cart-total{margin-right:auto}
+#cart{display:none;position:fixed;inset:0;background:#171216a8;z-index:30;padding:14px;overflow:auto;backdrop-filter:blur(3px)}
+.cart-box{background:#fff;border-radius:20px;padding:19px;max-width:520px;margin:20px auto;box-shadow:var(--shadow)}
+.cart-head{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:8px}
+.cart-head h2{font-size:20px;margin:0;color:var(--ink)}
+.icon-close{border:0;background:#f3f3f5;border-radius:10px;width:36px;height:36px;font-size:20px;color:#555}
+.cart-item{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid var(--line);padding:13px 0;font-size:13px;line-height:1.7}
+.cart-item button{border:0;background:#f3f3f5;color:var(--red);width:29px;height:29px;border-radius:8px;font-weight:bold}
+.total{font-size:18px;color:var(--red);font-weight:900;margin:16px 0;padding:13px;background:var(--red-soft);border-radius:12px}
+#customerForm h3{font-size:16px;margin:18px 0 8px}
+input,textarea{width:100%;padding:13px;margin:6px 0;border:1px solid #e4e4e8;border-radius:11px;font-family:inherit;font-size:13px;background:#fff;outline:none}
+input:focus,textarea:focus{border-color:#d58a98;box-shadow:0 0 0 3px #b5122d10}
+.send,.close,.wa-link{border:0;border-radius:11px;color:#fff;padding:13px;width:100%;font-size:13px;font-weight:bold;cursor:pointer;font-family:inherit;text-align:center;text-decoration:none;display:block}
+.send{background:var(--red);margin-top:8px}
+.send:disabled{opacity:.6;cursor:not-allowed}
+.close{background:#555;margin-top:9px}
+#successPanel{display:none;background:#f0fff4;border:1px solid #b8e1c3;border-radius:13px;padding:14px;margin-top:14px}
+#successPanel p{line-height:1.9;margin:0 0 12px;color:#175b2a;font-size:13px}
+#successPanel .wa-link{background:var(--green)}
 #successPanel .secondary{margin-top:8px;background:#555}
-#loadMessage{text-align:center;color:#777;padding:18px;line-height:1.8}
-@media(min-width:650px){.products{grid-template-columns:repeat(3,minmax(0,1fr))}.food-photo{height:175px}}
-@media(max-width:360px){.food-photo{height:120px}.card-content{padding:10px}}
+footer{background:#201a1c;color:#d8cdd0;text-align:center;padding:25px 15px 95px;font-size:12px;line-height:2}
+.footer-brand{font-size:18px;font-weight:900;color:#fff;margin-bottom:4px}
+.footer-phone{color:#fff;text-decoration:none;font-weight:bold}
+@media(min-width:600px){
+ .products{grid-template-columns:repeat(3,minmax(0,1fr));gap:17px}
+ .food-photo{height:180px}
+ .content{padding-top:28px}
+ .card-content{padding:15px}
+ .card h3{font-size:15px}
+ .description{font-size:12px}
+}
+@media(min-width:900px){
+ .products{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .hero{min-height:270px}
+ .food-photo{height:190px}
+}
+@media(max-width:380px){
+ .brand-name{font-size:19px}
+ .header-call{padding:9px;font-size:11px}
+ .food-photo{height:125px}
+ .card-content{padding:10px}
+ .card-bottom{align-items:flex-start;flex-direction:column}
+ .add-btn{width:100%}
+}
 </style>
 </head>
 <body>
-<header>
-<div class="logo">🐔 Fresh Chicken</div>
-<p>أشهى الوجبات وأطيب النكهات</p>
+<div class="top-strip">🍗 طعم تحبه العائلة • أهلاً بكم في Fresh Chicken</div>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-mark">🐔</div>
+      <div>
+        <div class="brand-name">Fresh Chicken</div>
+        <div class="brand-tagline">أشهى الوجبات وأطيب النكهات</div>
+      </div>
+    </div>
+    <a class="header-call" href="tel:07706488633">☎ اتصل بنا</a>
+  </div>
 </header>
-<section class="hero">
-<h1>مرحباً بكم في Fresh Chicken</h1>
-<p>اختر وجبتك واستمتع بطلبك</p>
+
+<section class="hero-wrap">
+  <div class="hero">
+    <div class="hero-copy">
+      <span class="hero-kicker">مرحباً بكم في عالم النكهة</span>
+      <h1>وجبتك المفضلة…<br>على بُعد خطوات</h1>
+      <p>تصفح قائمة الطعام، اختر ما تحب، وأرسل طلبك بكل سهولة.</p>
+      <div class="hero-note">❤️ طازج ولذيذ في كل طلب</div>
+    </div>
+    <div class="hero-art" aria-hidden="true">🍗</div>
+  </div>
 </section>
-<nav class="categories" id="categories"></nav>
-<main>
-<h2 id="sectionTitle">جميع الوجبات 🍗</h2>
-<div id="loadMessage">جارٍ تحميل المنيو...</div>
-<div class="products" id="products"></div>
+
+<main class="content">
+  <div class="section-heading">
+    <div>
+      <h2 id="sectionTitle">جميع الوجبات 🍗</h2>
+      <p>اختر من قائمتنا واستمتع بوجبتك</p>
+    </div>
+  </div>
+  <div class="search-wrap">
+    <span>🔎</span>
+    <input id="productSearch" type="search" placeholder="ابحث عن وجبتك المفضلة..." autocomplete="off" aria-label="البحث عن المنتجات">
+  </div>
+  <nav class="categories" id="categories" aria-label="أقسام المنيو"></nav>
+  <div id="loadMessage">جارٍ تحميل المنيو...</div>
+  <div class="products" id="products"></div>
 </main>
-<div class="cart-bar" onclick="openCart()">
-🛒 سلة الطلبات (<span id="count">0</span>) - <span id="barTotal">0</span> د.ع
+
+<div class="cart-bar">
+  <button type="button" onclick="openCart()">
+    <span>🛒 سلة الطلبات</span>
+    <span class="cart-count" id="count">0</span>
+    <span class="cart-total"><span id="barTotal">0</span> د.ع　 ←</span>
+  </button>
 </div>
-<div id="cart">
-<div class="cart-box">
-<h2>🛒 سلة مشترياتك</h2>
-<div id="cartItems"></div>
-<div class="total">الإجمالي: <span id="total">0</span> د.ع</div>
-<div id="customerForm">
-<h3>بيانات الزبون</h3>
-<input id="customerName" placeholder="الاسم الكامل" autocomplete="name">
-<input id="customerPhone" type="tel" placeholder="رقم الهاتف" autocomplete="tel">
-<textarea id="customerAddress" placeholder="العنوان والمنطقة" rows="3"></textarea>
-<textarea id="notes" placeholder="ملاحظات إضافية (اختياري)" rows="2"></textarea>
-<button class="send" id="sendButton" onclick="sendOrder()">حفظ الطلب والمتابعة إلى واتساب</button>
+
+<div id="cart" role="dialog" aria-modal="true" aria-label="سلة الطلبات">
+  <div class="cart-box">
+    <div class="cart-head">
+      <h2>🛒 سلة مشترياتك</h2>
+      <button class="icon-close" type="button" onclick="closeCart()" aria-label="إغلاق">×</button>
+    </div>
+    <div id="cartItems"></div>
+    <div class="total">الإجمالي: <span id="total">0</span> د.ع</div>
+    <div id="customerForm">
+      <h3>بيانات الزبون</h3>
+      <input id="customerName" placeholder="الاسم الكامل" autocomplete="name">
+      <input id="customerPhone" type="tel" placeholder="رقم الهاتف" autocomplete="tel">
+      <textarea id="customerAddress" placeholder="العنوان والمنطقة" rows="3"></textarea>
+      <textarea id="notes" placeholder="ملاحظات إضافية (اختياري)" rows="2"></textarea>
+      <button class="send" id="sendButton" onclick="sendOrder()">حفظ الطلب والمتابعة إلى واتساب</button>
+    </div>
+    <div id="successPanel">
+      <p id="successText">تم حفظ طلبك بنجاح في النظام. اضغط الزر أدناه للانتقال إلى واتساب وإرسال تفاصيل الطلب.</p>
+      <a id="whatsappLink" class="wa-link" href="#" target="_blank" rel="noopener">فتح واتساب وإرسال الطلب</a>
+      <button class="close secondary" onclick="finishOrder()">إنهاء وإغلاق</button>
+    </div>
+    <button class="close" onclick="closeCart()">متابعة التصفح</button>
+  </div>
 </div>
-<div id="successPanel">
-<p id="successText">تم حفظ طلبك بنجاح في النظام. اضغط الزر أدناه للانتقال إلى واتساب وإرسال تفاصيل الطلب.</p>
-<a id="whatsappLink" class="wa-link" href="#" target="_blank" rel="noopener">فتح واتساب وإرسال الطلب</a>
-<button class="close secondary" onclick="finishOrder()">إنهاء وإغلاق</button>
-</div>
-<button class="close" style="background:#555;margin-top:10px" onclick="closeCart()">إغلاق</button>
-</div>
-</div>
+
 <footer>
-Fresh Chicken © جميع الحقوق محفوظة<br><br>
-للطلب والاستفسار: 07706488633
+  <div class="footer-brand">🐔 Fresh Chicken</div>
+  <div>شكراً لثقتكم بنا — نتمنى لكم وجبة شهية</div>
+  <div style="margin-top:9px">للطلب والاستفسار: <a class="footer-phone" href="tel:07706488633">07706488633</a></div>
+  <div style="margin-top:12px;color:#9f9296">Fresh Chicken © جميع الحقوق محفوظة</div>
 </footer>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
@@ -111,6 +216,7 @@ let selected = "الكل";
 let cart = [];
 let sendingOrder = false;
 let productsUnsubscribe = null;
+let searchTerm = "";
 
 function escapeHTML(value){
   return String(value ?? "").replace(/[&<>"']/g, char => ({
@@ -172,28 +278,36 @@ function renderCategories(){
 
 function renderProducts(){
   const list = document.getElementById("products");
-  const items = products.filter(p => selected === "الكل" || p.category === selected);
+  const normalizedSearch = searchTerm.trim().toLocaleLowerCase("ar");
+  const items = products.filter(p =>
+    (selected === "الكل" || p.category === selected) &&
+    (!normalizedSearch || (p.name + " " + p.category + " " + p.description).toLocaleLowerCase("ar").includes(normalizedSearch))
+  );
   document.getElementById("sectionTitle").textContent =
     selected === "الكل" ? "جميع الوجبات 🍗" : selected;
 
   if(!items.length){
-    list.innerHTML = "";
+    list.innerHTML = `<div class="empty-state">لا توجد نتائج مطابقة. جرّب كلمة بحث أخرى.</div>`;
     return;
   }
 
   list.innerHTML = items.map(p => {
     const image = /^https?:\/\/\S+$/i.test(p.imageUrl) ? p.imageUrl : fallbackImage;
     return `
-      <div class="card">
-        <img class="food-photo" src="${escapeHTML(image)}" alt="${escapeHTML(p.name)}"
-             loading="lazy" onerror="this.onerror=null;this.src='${fallbackImage}'">
+      <article class="card">
+        <div class="photo-wrap">
+          <img class="food-photo" src="${escapeHTML(image)}" alt="${escapeHTML(p.name)}"
+               loading="lazy" onerror="this.onerror=null;this.src='${fallbackImage}'">
+        </div>
         <div class="card-content">
           <h3>${escapeHTML(p.name)}</h3>
-          ${p.description ? `<div>${escapeHTML(p.description)}</div>` : ""}
-          <div class="price">${p.price.toLocaleString("en-US")} د.ع</div>
-          <button type="button" data-add-id="${escapeHTML(p.id)}">أضف إلى السلة +</button>
+          <div class="description">${p.description ? escapeHTML(p.description) : "&nbsp;"}</div>
+          <div class="card-bottom">
+            <div class="price">${p.price.toLocaleString("en-US")} د.ع</div>
+            <button class="add-btn" type="button" data-add-id="${escapeHTML(p.id)}">＋ أضف للسلة</button>
+          </div>
         </div>
-      </div>`;
+      </article>`;
   }).join("");
 
   list.querySelectorAll("[data-add-id]").forEach(button => {
@@ -206,6 +320,11 @@ function filter(category){
   renderCategories();
   renderProducts();
 }
+
+document.getElementById("productSearch").addEventListener("input", event => {
+  searchTerm = event.target.value;
+  renderProducts();
+});
 
 function addToCart(id){
   const p = products.find(product => product.id === id);
@@ -223,16 +342,16 @@ function updateCart(){
   document.getElementById("barTotal").textContent = total.toLocaleString("en-US");
   document.getElementById("total").textContent = total.toLocaleString("en-US");
 
-  document.getElementById("cartItems").innerHTML = cart.map(x=>`
+  document.getElementById("cartItems").innerHTML = cart.length ? cart.map(x=>`
     <div class="cart-item">
-      <div>${escapeHTML(x.name)}<br>${x.price.toLocaleString("en-US")} × ${x.qty}</div>
-      <div>
-        <button type="button" data-change-id="${escapeHTML(x.id)}" data-change="-1">−</button>
-        ${x.qty}
-        <button type="button" data-change-id="${escapeHTML(x.id)}" data-change="1">+</button>
+      <div>${escapeHTML(x.name)}<br><span style="color:#777">${x.price.toLocaleString("en-US")} × ${x.qty}</span></div>
+      <div style="display:flex;align-items:center;gap:7px">
+        <button type="button" aria-label="تقليل الكمية" data-change-id="${escapeHTML(x.id)}" data-change="-1">−</button>
+        <strong>${x.qty}</strong>
+        <button type="button" aria-label="زيادة الكمية" data-change-id="${escapeHTML(x.id)}" data-change="1">+</button>
       </div>
     </div>
-  `).join("");
+  `).join("") : `<div class="empty-state">سلتك فارغة حالياً. أضف وجبتك المفضلة أولاً.</div>`;
 
   document.querySelectorAll("[data-change-id]").forEach(button => {
     button.addEventListener("click", () =>
