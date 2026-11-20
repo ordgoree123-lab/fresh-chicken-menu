@@ -364,6 +364,7 @@ async function openAddImagePicker(){
 
 function setProductImage(url){
   
+
 async function handlePhoneImage(input) {
   const file = input.files && input.files[0];
 
@@ -397,6 +398,12 @@ async function handlePhoneImage(input) {
           canvas.height = Math.round(img.height * scale);
 
           const ctx = canvas.getContext("2d");
+
+          if (!ctx) {
+            reject(new Error("تعذر تجهيز الصورة."));
+            return;
+          }
+
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
           let quality = 0.75;
@@ -408,7 +415,7 @@ async function handlePhoneImage(input) {
           }
 
           if (result.length > 600000) {
-            reject(new Error("الصورة كبيرة جداً."));
+            reject(new Error("الصورة كبيرة جداً. اختر صورة أصغر."));
           } else {
             resolve(result);
           }
@@ -422,8 +429,12 @@ async function handlePhoneImage(input) {
       reader.readAsDataURL(file);
     });
 
-    document.getElementById("productImage").value = dataUrl;
-    document.getElementById("productImagePreview").src = dataUrl;
+    const imageField = document.getElementById("productImage");
+    const preview = document.getElementById("productImagePreview");
+
+    imageField.value = dataUrl;
+    preview.src = dataUrl;
+
     label.textContent = "تم اختيار الصورة وتجهيزها بنجاح ✓";
 
   } catch (error) {
@@ -434,15 +445,24 @@ async function handlePhoneImage(input) {
   input.value = "";
 }
 
-  const safeUrl=url||fallbackImage;
-  document.getElementById("productImage").value=safeUrl;
-  const preview=document.getElementById("productImagePreview");
-  preview.src=safeUrl;
-  preview.onerror=()=>{preview.src=fallbackImage;};
-  const photo=imageLibrary.find(x=>x.url===safeUrl);
-  document.getElementById("selectedImageLabel").textContent=
-    "الصورة المختارة: "+(photo?photo.name:"صورة المنتج");
+function setProductImage(url) {
+  const safeUrl = url || fallbackImage;
+
+  document.getElementById("productImage").value = safeUrl;
+
+  const preview = document.getElementById("productImagePreview");
+  preview.src = safeUrl;
+
+  preview.onerror = () => {
+    preview.src = fallbackImage;
+  };
+
+  const photo = imageLibrary.find(x => x.url === safeUrl);
+
+  document.getElementById("selectedImageLabel").textContent =
+    "الصورة المختارة: " + (photo ? photo.name : "صورة المنتج");
 }
+
 
 /* عند تغيير القسم، نختار صورته الافتراضية إذا لم يحدد المستخدم صورة */
 document.getElementById("productCategory").addEventListener("change",()=>{
