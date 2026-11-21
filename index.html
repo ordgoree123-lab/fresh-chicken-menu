@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -74,7 +75,24 @@ const db=firebase.firestore(),whatsapp="9647744888803";
 const fallbackImage="https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80";
 let products=[],categories=["الكل"],selected="الكل",cart=[],sendingOrder=false,searchTerm="",detailProduct=null,detailQty=1;
 function escapeHTML(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
-function safeImage(url){return /^https?:\/\/\S+$/i.test(url||"")?url:fallbackImage;}
+
+/* تم إصلاح هذه الدالة لقبول صور الهاتف بصيغة Base64 */
+function safeImage(url) {
+  if (typeof url !== "string" || !url.trim()) {
+    return fallbackImage;
+  }
+
+  if (/^data:image\/(jpeg|jpg|png|webp);base64,[A-Za-z0-9+/]+=*$/i.test(url)) {
+    return url;
+  }
+
+  if (/^https?:\/\/\S+$/i.test(url)) {
+    return url;
+  }
+
+  return fallbackImage;
+}
+
 function startProductsListener(){
  const msg=document.getElementById("loadMessage");msg.textContent="جارٍ تحميل المنيو...";
  db.collection("products").onSnapshot(snapshot=>{
@@ -85,7 +103,7 @@ function startProductsListener(){
   msg.style.display=products.length?"none":"block";msg.textContent=products.length?"":"لا توجد منتجات متاحة حالياً. يرجى المحاولة لاحقاً.";
   renderCategories();renderProducts();
  },error=>{console.error(error);msg.style.display="block";msg.textContent="تعذر تحميل المنيو حالياً. يرجى تحديث الصفحة أو المحاولة لاحقاً.";});
-}
+} 
 function renderCategories(){const nav=document.getElementById("categories");nav.innerHTML=categories.map(c=>`<button type="button" class="${c===selected?"active":""}" data-category="${escapeHTML(c)}">${escapeHTML(c)}</button>`).join("");nav.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>filter(b.dataset.category)));}
 function renderProducts(){
  const list=document.getElementById("products"),q=searchTerm.trim().toLocaleLowerCase("ar");
