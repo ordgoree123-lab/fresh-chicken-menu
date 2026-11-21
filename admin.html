@@ -5,6 +5,30 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#c8102e">
+<title>فريش تشيكن Fresh Chicken | لوحة الإدارة</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Tahoma,Arial;background:#f4f4f4;color:#222}
+header{background:#c8102e;color:white;padding:20px;text-align:center}
+.container{max-width:1100px;margin:20px auto;padding:15px}
+.box{background:white;padding:18px;border-radius:12px;margin-bottom:15px;box-shadow:0 2px 8px #0001}
+input,button,select,textarea{width:100%;padding:12px;margin:7px 0;border:1px solid #ddd;border-radius:8px;font-size:15px;font-family:Tahoma,Arial}
+textarea{min-height:80px}
+button{background:#c8102e;color:white;border:0;cursor:pointer}
+button:disabled{opacity:.55;cursor:not-allowed}
+button.secondary{background:#333}
+button.green{background:#168b45}
+button.blue{background:#1769aa}
+.order,.product{border:1px solid #ddd;border-radius:10px;padding:15px;margin:12px 0;background:#fff}
+.order h3{margin-top:0;color:#c8102e;overflow-wrap:anywhere}
+.muted{color:#777;font-size:13px;line-height:1.7}
+.hidden{display:none!important}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#c8102e">
 <title>Fresh Chicken | لوحة الإدارة</title>
 <style>
 *{box-sizing:border-box}
@@ -68,7 +92,7 @@ hr{border:0;border-top:1px solid #eee;margin:17px 0}
 <body>
 
 <header>
-<h2>Fresh Chicken فريش تشيكن </h2>
+<h2>Fresh Chicken فريش تشيكن</h2>
 <div>لوحة الإدارة</div>
 </header>
 
@@ -309,7 +333,6 @@ async function openAddImagePicker(){
   if(chosen)setProductImage(chosen);
 }
 
-/* ضغط الصورة قبل حفظها */
 function compressPhoneImage(file){
   return new Promise((resolve,reject)=>{
     const reader=new FileReader();
@@ -394,7 +417,6 @@ function setProductImage(url){
     "الصورة المختارة: "+(photo?photo.name:"صورة من الهاتف أو صورة المنتج");
 }
 
-/* اختيار صورة من الهاتف أثناء تعديل المنتج */
 function choosePhoneImageForEdit(){
   return new Promise(resolve=>{
     const picker=document.createElement("input");
@@ -607,7 +629,7 @@ function notifyNewOrder(id,order){
 
   if(soundEnabled)playNotificationSound();
   const displayNumber=order.orderNumber||id;
-setNotificationStatus("وصل طلب جديد من "+customer+" — رقم الطلب: "+displayNumber);
+  setNotificationStatus("وصل طلب جديد من "+customer+" — رقم الطلب: "+displayNumber);
 
   if("Notification" in window&&Notification.permission==="granted"){
     try{
@@ -753,13 +775,14 @@ async function loadOrders(){
   }
 }
 
+/* عرض الطلبات مع طريقة الاستلام وأجور التوصيل */
 function renderOrders(){
   const area=document.getElementById("orders");
   const search=(document.getElementById("orderSearch")?.value||"").trim().toLowerCase();
   const status=document.getElementById("statusFilter")?.value||"all";
 
   const filtered=allOrders.filter(({id,data})=>{
-    const haystack=[id,data.orderNumber,data.customerName,data.customerPhone].join(" ").toLowerCase();6
+    const haystack=[id,data.orderNumber,data.customerName,data.customerPhone].join(" ").toLowerCase();
     return (!search||haystack.includes(search))&&(status==="all"||(data.status||"new")===status);
   });
 
@@ -785,6 +808,15 @@ function renderOrders(){
 
     const date=orderDate(order);
     const dateText=date?date.toLocaleString("ar-IQ"):"غير محدد";
+
+    const methodLabel=order.deliveryMethod==="pickup"?"استلام من داخل المطعم":
+      order.deliveryMethod==="delivery"?"توصيل إلى المنزل":"غير محدد";
+
+    const deliveryFee=Number(order.deliveryFee)||0;
+    const subtotal=order.subtotal!==undefined&&order.subtotal!==null?
+      (Number(order.subtotal)||0):
+      Math.max(0,(Number(order.total)||0)-deliveryFee);
+
     const card=document.createElement("div");
     card.className="order";
 
@@ -792,11 +824,15 @@ function renderOrders(){
       <h3>طلب رقم: ${escapeHTML(order.orderNumber||id)}</h3>
       <p><b>الزبون:</b> ${escapeHTML(order.customerName||"غير محدد")}</p>
       <p><b>الهاتف:</b> ${escapeHTML(order.customerPhone||"غير محدد")}</p>
+      <p><b>طريقة الاستلام:</b> ${escapeHTML(methodLabel)}</p>
       <p><b>العنوان:</b> ${escapeHTML(order.customerAddress||"غير محدد")}</p>
       <p><b>ملاحظات الطلب:</b> ${escapeHTML(order.notes||"لا توجد")}</p>
       <p><b>التاريخ:</b> ${escapeHTML(dateText)}</p>
       <hr><b>المنتجات:</b>${itemsHTML}
-      <hr><p><b>المجموع:</b> ${formatMoney(order.total)}</p>
+      <hr>
+      <p><b>مجموع المنتجات:</b> ${formatMoney(subtotal)}</p>
+      <p><b>أجور التوصيل:</b> ${formatMoney(deliveryFee)}</p>
+      <p><b>المجموع النهائي:</b> ${formatMoney(order.total)}</p>
       <p>الحالة الحالية: <span class="pill ${STATUS_CLASSES[order.status]||"status-new"}">${escapeHTML(STATUS_LABELS[order.status]||"جديد")}</span></p>
       <select class="statusSelect">
         <option value="new">جديد</option>
@@ -831,7 +867,9 @@ function renderOrders(){
   });
 }
 
+/* طباعة الفاتورة مع بيانات التوصيل */
 function printInvoice(id,order){
+  const displayNumber=order.orderNumber||id;
   const items=Array.isArray(order.items)?order.items:[];
   const rows=items.map(item=>`
     <tr>
@@ -841,6 +879,14 @@ function printInvoice(id,order){
       <td>${formatMoney((Number(item.price)||0)*(Number(item.quantity)||0))}</td>
     </tr>
   `).join("");
+
+  const methodLabel=order.deliveryMethod==="pickup"?"استلام من داخل المطعم":
+    order.deliveryMethod==="delivery"?"توصيل إلى المنزل":"غير محدد";
+
+  const deliveryFee=Number(order.deliveryFee)||0;
+  const subtotal=order.subtotal!==undefined&&order.subtotal!==null?
+    (Number(order.subtotal)||0):
+    Math.max(0,(Number(order.total)||0)-deliveryFee);
 
   const date=orderDate(order);
   const win=window.open("","_blank","width=800,height=700");
@@ -871,13 +917,16 @@ function printInvoice(id,order){
   <p>رقم الطلب: ${escapeHTML(displayNumber)}</p>
   <p>الزبون: ${escapeHTML(order.customerName||"")}</p>
   <p>الهاتف: ${escapeHTML(order.customerPhone||"")}</p>
-  <p>العنوان: ${escapeHTML(order.customerAddress||"")}</p>
+  <p>طريقة الاستلام: ${escapeHTML(methodLabel)}</p>
+  <p>العنوان: ${escapeHTML(order.customerAddress||"غير محدد")}</p>
   <p>التاريخ: ${escapeHTML(date?date.toLocaleString("ar-IQ"):"غير محدد")}</p>
   <table>
   <thead><tr><th>المنتج</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th></tr></thead>
   <tbody>${rows}</tbody>
   </table>
-  <p class="total">المجموع: ${formatMoney(order.total)}</p>
+  <p>مجموع المنتجات: ${formatMoney(subtotal)}</p>
+  <p>أجور التوصيل: ${formatMoney(deliveryFee)}</p>
+  <p class="total">المجموع النهائي: ${formatMoney(order.total)}</p>
   <p>حالة الطلب: ${escapeHTML(STATUS_LABELS[order.status]||"جديد")}</p>
   <script>window.onload=()=>window.print();<\/script>
   </body>
