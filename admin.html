@@ -68,7 +68,7 @@ hr{border:0;border-top:1px solid #eee;margin:17px 0}
 <body>
 
 <header>
-<h2>Fresh Chicken</h2>
+<h2>Fresh Chicken فريش تشيكن </h2>
 <div>لوحة الإدارة</div>
 </header>
 
@@ -606,12 +606,13 @@ function notifyNewOrder(id,order){
   const customer=order.customerName||"زبون جديد";
 
   if(soundEnabled)playNotificationSound();
-  setNotificationStatus("وصل طلب جديد من "+customer+" — رقم الطلب: "+id);
+  const displayNumber=order.orderNumber||id;
+setNotificationStatus("وصل طلب جديد من "+customer+" — رقم الطلب: "+displayNumber);
 
   if("Notification" in window&&Notification.permission==="granted"){
     try{
       const notification=new Notification("طلب جديد من Fresh Chicken",{
-        body:"الزبون: "+customer+"\nرقم الطلب: "+id+"\nالمجموع: "+formatMoney(order.total),
+        body:"الزبون: "+customer+"\nرقم الطلب: "+displayNumber+"\nالمجموع: "+formatMoney(order.total),
         tag:"fresh-order-"+id,
         renotify:false
       });
@@ -758,7 +759,7 @@ function renderOrders(){
   const status=document.getElementById("statusFilter")?.value||"all";
 
   const filtered=allOrders.filter(({id,data})=>{
-    const haystack=[id,data.customerName,data.customerPhone].join(" ").toLowerCase();
+    const haystack=[id,data.orderNumber,data.customerName,data.customerPhone].join(" ").toLowerCase();6
     return (!search||haystack.includes(search))&&(status==="all"||(data.status||"new")===status);
   });
 
@@ -788,7 +789,7 @@ function renderOrders(){
     card.className="order";
 
     card.innerHTML=`
-      <h3>طلب رقم: ${escapeHTML(id)}</h3>
+      <h3>طلب رقم: ${escapeHTML(order.orderNumber||id)}</h3>
       <p><b>الزبون:</b> ${escapeHTML(order.customerName||"غير محدد")}</p>
       <p><b>الهاتف:</b> ${escapeHTML(order.customerPhone||"غير محدد")}</p>
       <p><b>العنوان:</b> ${escapeHTML(order.customerAddress||"غير محدد")}</p>
@@ -853,7 +854,7 @@ function printInvoice(id,order){
   <html lang="ar" dir="rtl">
   <head>
   <meta charset="UTF-8">
-  <title>فاتورة ${escapeHTML(id)}</title>
+  <title>فاتورة ${escapeHTML(displayNumber)}</title>
   <style>
   body{font-family:Tahoma,Arial;padding:25px;color:#222}
   h2{text-align:center;color:#c8102e}
@@ -867,7 +868,7 @@ function printInvoice(id,order){
   <body>
   <h2>Fresh Chicken</h2>
   <h3>فاتورة طلب</h3>
-  <p>رقم الطلب: ${escapeHTML(id)}</p>
+  <p>رقم الطلب: ${escapeHTML(displayNumber)}</p>
   <p>الزبون: ${escapeHTML(order.customerName||"")}</p>
   <p>الهاتف: ${escapeHTML(order.customerPhone||"")}</p>
   <p>العنوان: ${escapeHTML(order.customerAddress||"")}</p>
