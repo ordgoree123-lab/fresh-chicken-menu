@@ -70,7 +70,7 @@ footer{background:#1d1719;color:#d8cdd0;text-align:center;padding:26px 15px 100p
 <script>
 const firebaseConfig={apiKey:"AIzaSyAzvEG-JYV2DN30oZGmGM1Wt_HkGqnQqjY",authDomain:"fresh-chicken-menu.firebaseapp.com",projectId:"fresh-chicken-menu",storageBucket:"fresh-chicken-menu.firebasestorage.app",messagingSenderId:"353092642080",appId:"1:353092642080:web:153c93521ed13ba2d12345",measurementId:"G-V3BQ6YTRCN"};
 firebase.initializeApp(firebaseConfig);
-const db=firebase.firestore(),whatsapp="964774888803";
+const db=firebase.firestore(),whatsapp="9647744888803";
 const fallbackImage="https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80";
 let products=[],categories=["الكل"],selected="الكل",cart=[],sendingOrder=false,searchTerm="",detailProduct=null,detailQty=1;
 function escapeHTML(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
