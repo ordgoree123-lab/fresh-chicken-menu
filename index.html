@@ -629,10 +629,15 @@ async function sendOrder(){
   updateCart();
  }catch(error){
   console.error("Firebase order error:",error);
-  alert("تعذر حفظ الطلب في قاعدة البيانات. لم يتم إنشاء رابط واتساب. يرجى المحاولة لاحقاً.");
- }finally{
-  sendingOrder=false;btn.disabled=false;btn.textContent="حفظ الطلب والمتابعة إلى واتساب";
- }
+
+  const errorCode = error.code || "unknown";
+  const errorMessage = error.message || "لا توجد تفاصيل";
+
+  alert(
+    "فشل حفظ الطلب\n\n" +
+    "رمز الخطأ: " + errorCode +
+    "\nالتفاصيل: " + errorMessage
+  );
 }
 function finishOrder(){
  document.getElementById("successPanel").style.display="none";
