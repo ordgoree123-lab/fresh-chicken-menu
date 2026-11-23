@@ -782,9 +782,17 @@ function renderOrders(){
   const status=document.getElementById("statusFilter")?.value||"all";
 
   const filtered=allOrders.filter(({id,data})=>{
-    const haystack=[id,data.orderNumber,data.customerName,data.customerPhone].join(" ").toLowerCase();
-    return (!search||haystack.includes(search))&&(status==="all"||(data.status||"new")===status);
-  });
+  const haystack=[id,data.orderNumber,data.customerName,data.customerPhone].join(" ").toLowerCase();
+
+  // إخفاء الطلبات المكتملة والملغاة من القائمة الرئيسية
+  const currentStatus=data.status||"new";
+  if(currentStatus==="completed" || currentStatus==="cancelled"){
+    return false;
+  }
+
+  return (!search||haystack.includes(search)) &&
+         (status==="all"||currentStatus===status);
+});
 
   document.getElementById("count").textContent="الطلبات المعروضة: "+filtered.length+" من "+allOrders.length;
 
