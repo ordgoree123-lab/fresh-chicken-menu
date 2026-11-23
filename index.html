@@ -27,6 +27,46 @@ footer{background:#171719;color:#fff;margin-top:55px;padding:30px 0 90px;text-al
 @media(max-width:750px){.featured-grid,.products-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.product-image-wrap{height:155px}.product-info{padding:11px}.product-info h3{font-size:13px}.product-description{font-size:10px}.add-btn{padding:8px 10px;font-size:10px}.hero{min-height:260px}.hero-content{padding:25px}}
 @media(max-width:430px){.search-sort{grid-template-columns:1fr}.brand-name{font-size:14px}.nav-btn{padding:9px 10px;font-size:10px}.trust-item{font-size:10px}.product-image-wrap{height:138px}.hero h1{font-size:29px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* Modern Fresh Chicken visual layer */
+:root{--red:#d20d32;--red2:#a90827;--ink:#151518;--bg:#f3f3f6;--line:#e7e7ed;--shadow:0 14px 38px rgba(20,20,28,.075);--deep:0 26px 65px rgba(20,20,28,.17)}
+body{background:radial-gradient(ellipse at 8% 8%,rgba(210,13,50,.055),transparent 28rem),linear-gradient(180deg,#fafafd,#f2f2f5)}
+.top-strip{background:linear-gradient(90deg,#171719,#302129 50%,#171719);letter-spacing:.15px}
+header{background:rgba(255,255,255,.84);box-shadow:0 5px 24px rgba(18,18,25,.035)}
+.brand-mark{border-radius:16px;background:linear-gradient(145deg,#f01c48,#9d0825);box-shadow:0 9px 24px rgba(210,13,50,.28),inset 0 1px 0 #ffffff55}
+.nav-btn{border-radius:13px}.call-btn{background:#f2f2f5;border:1px solid #e9e9ee}
+.cart-btn,.category-btn.active,.add-btn,.primary-btn,.cart-bar button{background:linear-gradient(135deg,#e71942,#ae0929)}
+.cart-btn{box-shadow:0 8px 22px rgba(210,13,50,.25)}
+.hero{min-height:390px;border-radius:30px;background:linear-gradient(90deg,rgba(12,9,12,.94),rgba(18,10,13,.76) 43%,rgba(18,10,13,.12)),url("https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=1900&q=90") center 48%/cover;box-shadow:0 28px 70px rgba(33,12,19,.22);isolation:isolate}
+.hero:before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(circle at 78% 52%,rgba(244,31,75,.2),transparent 34%);pointer-events:none}
+.hero:after{width:420px;height:420px;border-color:#ffffff20;box-shadow:0 0 0 42px #ffffff09,0 0 0 84px #ffffff06}
+.hero-content{max-width:650px;padding:clamp(25px,5vw,54px)}.hero-tag{background:#ffffff1f;border-color:#ffffff55;box-shadow:inset 0 1px 0 #ffffff22;backdrop-filter:blur(8px)}
+.hero h1{letter-spacing:-1.1px;text-shadow:0 5px 24px #0005}.hero-link{border:1px solid #ffffff24;background:linear-gradient(135deg,#ed1741,#b40829);box-shadow:0 12px 28px rgba(210,13,50,.36)}
+.trust-item{border-radius:18px;padding:16px 12px;background:linear-gradient(145deg,#fff,#fafafd);box-shadow:0 9px 25px rgba(20,20,28,.045);transition:transform .22s,box-shadow .22s}.trust-item:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.section-title{margin-top:36px}.section-title h2{letter-spacing:-.45px}.section-kicker{letter-spacing:1.6px}
+.menu-tools{border-radius:19px;padding:16px;box-shadow:0 12px 32px rgba(20,20,28,.055)}
+.field{border-color:#e7e7ed;background:#fbfbfd;transition:border-color .2s,box-shadow .2s,background .2s}.field:focus{background:#fff}
+.categories{gap:9px}.category-btn{padding:9px 17px;background:#f6f6f8;transition:transform .2s,background .2s,box-shadow .2s}.category-btn:active{transform:scale(.96)}.category-btn.active{box-shadow:0 7px 17px rgba(210,13,50,.2)}
+.product-card{border:1px solid rgba(226,226,233,.9);border-radius:22px;box-shadow:0 10px 28px rgba(22,22,30,.055);transition:transform .28s cubic-bezier(.2,.75,.25,1),box-shadow .28s,border-color .28s}
+.product-card:hover{transform:translateY(-7px);border-color:#f0c4ce;box-shadow:0 22px 48px rgba(22,22,30,.13)}
+.product-image-wrap{height:220px;background:#e9e9ed}.product-image{transition:transform .7s cubic-bezier(.2,.7,.2,1),filter .4s}.product-card:hover .product-image{transform:scale(1.09);filter:saturate(1.12) contrast(1.02)}
+.product-badge{background:linear-gradient(135deg,#ed1741,#a90827);box-shadow:0 7px 18px #0003}
+.image-zoom-hint{opacity:1;transform:none;background:#121216a8;backdrop-filter:blur(8px)}
+.product-info{padding:16px}.product-info h3{font-size:15px;letter-spacing:-.2px}.product-bottom{margin-top:14px}.price{font-size:15px}
+.add-btn{border-radius:12px;padding:10px 15px;box-shadow:0 6px 14px rgba(210,13,50,.16);transition:transform .18s,box-shadow .18s,filter .18s}.add-btn:hover{filter:brightness(1.06);box-shadow:0 9px 18px rgba(210,13,50,.25)}.add-btn:active{transform:scale(.94)}
+.cart-bar{border:1px solid #ffffff20;background:linear-gradient(110deg,#171719,#292126);box-shadow:0 18px 48px #0005;backdrop-filter:blur(14px)}
+.modal{border:1px solid #ffffff80;box-shadow:0 30px 90px #0005}.modal-head h2{letter-spacing:-.3px}
+.close-btn{transition:transform .2s,background .2s}.close-btn:hover{background:#ffe9ed;transform:rotate(90deg)}
+.detail-image{box-shadow:0 12px 28px rgba(20,20,28,.12)}.addon-option{transition:border-color .2s,background .2s}.addon-option:has(input:checked){border-color:#eaa3b2;background:#fff6f8}
+.qty-control button{transition:transform .15s,background .15s}.qty-control button:active{transform:scale(.9)}
+.cart-line{gap:14px}.cart-line img{box-shadow:0 5px 14px rgba(20,20,28,.1)}
+.cart-summary{background:linear-gradient(145deg,#fafafd,#f3f3f6)}.method-option:has(input:checked){border-color:#eaa3b2;background:#fff6f8}
+.lightbox{backdrop-filter:blur(12px)}.lightbox img{box-shadow:0 25px 90px #0009}
+footer{background:radial-gradient(circle at 50% 0%,#38202a,#171719 58%)}
+@media(hover:hover){.product-card:hover .image-zoom-hint{background:#121216c7}}
+@media(max-width:750px){.hero{min-height:285px;border-radius:23px;background-position:58% center}.hero-content{padding:26px}.product-image-wrap{height:165px}.product-info{padding:12px}}
+@media(max-width:430px){.hero{min-height:260px}.hero h1{font-size:28px}.product-image-wrap{height:145px}.trust-item{border-radius:15px;padding:12px 7px}}
+
 </style>
 </head>
 <body>
@@ -36,7 +76,7 @@ footer{background:#171719;color:#fff;margin-top:55px;padding:30px 0 90px;text-al
   <div class="nav-actions"><a class="nav-btn call-btn" href="tel:07744888803">📞 اتصال</a><button class="nav-btn cart-btn" onclick="openCart()">🛒 السلة <span id="navCartCount">0</span></button></div>
 </div></header>
 <main class="container">
-  <section class="hero"><div class="hero-content"><span class="hero-tag">✦ FRESH CHICKEN</span><h1>قرمشة تحبها<br>وطعم يرجعك إلنا 🍗</h1><p>اكتشف وجباتنا الطازجة، اختر إضافاتك المفضلة، واطلب بسهولة من هاتفك.</p><a class="hero-link" href="#menu">تصفح المنيو الآن ←</a></div></section>
+  <section class="hero"><div class="hero-content"><span class="hero-tag">✦ FRESH CHICKEN&nbsp; | &nbsp;طازج يومياً</span><h1>قرمشة تحبها<br>وطعم يرجعك إلنا 🍗</h1><p>اكتشف وجباتنا الطازجة، اختر إضافاتك المفضلة، واطلب بسهولة من هاتفك.</p><a class="hero-link" href="#menu">تصفح المنيو الآن ←</a></div></section>
   <section class="trust-row"><div class="trust-item"><span>🍗</span>وجبات متنوعة</div><div class="trust-item"><span>⚡</span>طلب سريع وسهل</div><div class="trust-item"><span>❤️</span>نهتم برضاكم</div></section>
   <section id="featuredSection" class="hidden"><div class="section-title"><div><div class="section-kicker">اختياراتنا</div><h2>⭐ وجبات مميزة</h2><p>اختيارات مميزة من قائمتنا</p></div></div><div id="featuredProducts" class="featured-grid"></div></section>
   <section id="menu"><div class="section-title"><div><div class="section-kicker">FRESH MENU</div><h2>قائمة الطعام 🍽️</h2><p>اختر وجبتك المفضلة</p></div></div>
