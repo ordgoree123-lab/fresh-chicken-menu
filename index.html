@@ -112,7 +112,27 @@ const money=value=>(Number(value)||0).toLocaleString("en-US")+" د.ع";
 function numericValue(value){if(typeof value==="string")value=value.replace(/[,،\s]/g,"").trim();const n=Number(value);return Number.isFinite(n)?n:NaN}
 function safePrice(value){const n=numericValue(value);return Number.isSafeInteger(n)&&n>=0?n:null}
 function escapeHTML(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
-function safeImage(url){const value=String(url||"").trim();try{const u=new URL(value);if(u.protocol==="https:"||u.protocol==="http:")return u.href}catch(e){}return fallbackImage}
+function safeImage(url){
+  const value = String(url || "").trim();
+
+  // السماح بالصور المختارة من الهاتف والمحفوظة بصيغة Base64
+  if (
+    value.length <= 500000 &&
+    /^data:image\/(jpeg|jpg|png|webp|gif);base64,[A-Za-z0-9+/]+=*$/.test(value)
+  ) {
+    return value;
+  }
+
+  // السماح بروابط الصور العادية
+  try {
+    const u = new URL(value);
+    if (u.protocol === "https:" || u.protocol === "http:") {
+      return u.href;
+    }
+  } catch (e) {}
+
+  return fallbackImage;
+}
 function getProductPrice(p){const regular=safePrice(p.price);if(regular===null)return null;const sale=safePrice(p.salePrice);return sale!==null&&sale>0&&sale<regular?sale:regular}
 function getProductById(id){return productsData.find(p=>p.id===id)||null}
 function getProductAddons(p){if(!Array.isArray(p.addons))return[];return p.addons.slice(0,10).map(a=>{const name=String(a.name||"").trim(),price=safePrice(a.price);return name&&price!==null?{name,price}:null}).filter(Boolean)}
